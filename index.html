@@ -2,347 +2,745 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>AR Wall 3D</title>
 <style>
-:root{--bg:#06060e;--sur:#0f0f1c;--brd:#1e1e35;--acc:#7c5cff;--acc2:#e040fb;--tx:#f0f0ff;--mt:#555570;}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);font-family:'Helvetica Neue',Helvetica,sans-serif;color:var(--tx);overflow:hidden;width:100vw;height:100dvh;touch-action:none;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#06060f;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;width:100vw;height:100dvh}
 
-/* SPLASH */
-#splash{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:22px;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a0a3e,var(--bg) 70%);}
-.s-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 0 40px #7c5cff44;}
-.s-title{font-size:26px;font-weight:800;letter-spacing:-0.8px;text-align:center;background:linear-gradient(135deg,#b09fff,#f080ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.s-sub{font-size:13px;color:var(--mt);text-align:center;line-height:1.7;max-width:300px;}
-.card{background:var(--sur);border:1px solid var(--brd);border-radius:20px;padding:18px;width:100%;max-width:360px;}
-.clbl{font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;}
-.prev-box{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0a0a18;border:2px dashed var(--brd);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;position:relative;}
-.prev-box:active{border-color:var(--acc);}
-.prev-box img{width:100%;height:100%;object-fit:cover;display:none;}
-.ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--mt);font-size:12px;}
-input[type=file]{display:none;}
-.sbtn{width:100%;max-width:360px;background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;border-radius:16px;padding:17px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 28px #7c5cff40;transition:transform .1s,opacity .2s;}
-.sbtn:active{transform:scale(.97);opacity:.88;}
-.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.chip{background:var(--sur);border:1px solid var(--brd);border-radius:50px;padding:5px 13px;font-size:11px;color:var(--mt);}
-.chip b{color:#88ffcc;margin-right:3px;}
+/* ── SPLASH ─────────────────────── */
+#splash{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100dvh;padding:28px;gap:18px;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,#180a40,#06060f 70%);
+}
+.slogo{font-size:52px;filter:drop-shadow(0 0 26px #9955ffaa)}
+h1{font-size:25px;font-weight:900;letter-spacing:-0.8px;text-align:center;
+  background:linear-gradient(130deg,#bb88ff 20%,#ff66cc 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ssub{font-size:13px;color:#666;text-align:center;line-height:1.65;max-width:300px}
+.card{background:#0e0e1c;border:1px solid #1e1e38;border-radius:20px;padding:16px;width:100%;max-width:350px}
+.clbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.pbox{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;
+  background:#0a0a18;border:2px dashed #1e1e38;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:border-color .2s;position:relative}
+.pbox:active{border-color:#9955ff}
+.pbox img{width:100%;height:100%;object-fit:cover;display:none}
+.ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:#333;font-size:11px}
+.ph .ei{font-size:28px}
+input[type=file]{display:none}
+.sbtn{
+  background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
+  border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;
+  width:100%;max-width:350px;box-shadow:0 6px 28px #6622ee44;
+  transition:transform .1s,opacity .2s}
+.sbtn:active{transform:scale(.97);opacity:.88}
+.tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tag{background:#0e0e1c;border:1px solid #1e1e38;border-radius:50px;padding:5px 12px;font-size:11px;color:#666}
+.tag b{color:#99aaff;font-weight:600}
 
-/* AR WORLD */
-#aw{display:none;position:fixed;inset:0;z-index:10;}
-#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
-#tc{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;}
-#ui{position:absolute;inset:0;z-index:5;pointer-events:none;}
-
-/* Crosshair */
-#ch{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;pointer-events:none;transition:opacity .3s;}
-#ch::before,#ch::after{content:'';position:absolute;background:rgba(180,160,255,.85);box-shadow:0 0 8px var(--acc);}
-#ch::before{width:2px;height:100%;left:calc(50% - 1px);}
-#ch::after{width:100%;height:2px;top:calc(50% - 1px);}
-.cc{position:absolute;width:10px;height:10px;border-color:rgba(180,160,255,.85);border-style:solid;box-shadow:0 0 6px var(--acc);}
-.tl{top:0;left:0;border-width:2px 0 0 2px;}
-.tr{top:0;right:0;border-width:2px 2px 0 0;}
-.bl{bottom:0;left:0;border-width:0 0 2px 2px;}
-.br{bottom:0;right:0;border-width:0 2px 2px 0;}
+/* ── AR SCREEN ─────────────────── */
+#ar{display:none;position:fixed;inset:0;z-index:100}
+#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+#cv{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none}
 
 /* Top bar */
-#tb{position:absolute;top:0;left:0;right:0;padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(6,6,14,.75),transparent);pointer-events:all;}
-.tbt{font-size:14px;font-weight:700;letter-spacing:.5px;}
-.tbb{font-size:11px;font-weight:600;background:rgba(124,92,255,.3);border:1px solid rgba(124,92,255,.5);border-radius:50px;padding:4px 12px;color:#c0b0ff;}
-.tbc{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:50px;padding:6px 15px;font-size:13px;cursor:pointer;}
+#topbar{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  padding:18px 20px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);
+  pointer-events:none}
+.tbtitle{font-size:14px;font-weight:700;opacity:.9;display:flex;align-items:center;gap:8px}
+.tbclose{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;
+  border-radius:50px;padding:7px 16px;font-size:12px;cursor:pointer;pointer-events:all}
+
+/* Mode badge */
+#modebadge{
+  position:absolute;top:78px;left:50%;transform:translateX(-50%);z-index:10;
+  padding:7px 18px;border-radius:50px;font-size:12px;font-weight:700;
+  backdrop-filter:blur(12px);border:1px solid;pointer-events:none;
+  transition:background .3s,border-color .3s,color .3s;white-space:nowrap}
+#modebadge.edit{background:rgba(255,170,0,.2);border-color:rgba(255,200,0,.4);color:#ffd060}
+#modebadge.locked{background:rgba(0,200,100,.2);border-color:rgba(0,220,110,.4);color:#44ffaa}
 
 /* Status */
-#sh{position:absolute;top:76px;left:50%;transform:translateX(-50%);background:rgba(6,6,14,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:8px 20px;font-size:12px;color:#bbb;white-space:nowrap;pointer-events:none;transition:all .4s;}
-#pb{display:none;position:absolute;top:76px;left:50%;transform:translateX(-50%);background:rgba(40,200,100,.2);backdrop-filter:blur(10px);border:1px solid rgba(60,220,120,.35);border-radius:50px;padding:8px 20px;font-size:12px;color:#6fffa0;white-space:nowrap;pointer-events:none;animation:fid .4s ease;}
-@keyframes fid{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+#status{
+  position:absolute;top:122px;left:50%;transform:translateX(-50%);z-index:10;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);border-radius:50px;
+  padding:6px 16px;font-size:11px;color:#bbb;
+  white-space:nowrap;pointer-events:none;transition:opacity .4s}
 
-/* Bottom */
-#bp{position:absolute;bottom:0;left:0;right:0;padding:16px 18px 40px;background:linear-gradient(to top,rgba(6,6,14,.85),transparent);display:flex;flex-direction:column;gap:12px;align-items:center;pointer-events:all;}
-.sr{display:flex;align-items:center;gap:10px;background:rgba(15,15,28,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:9px 18px;width:100%;max-width:360px;}
-.sr label{font-size:11px;color:#888;min-width:48px;}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:rgba(255,255,255,.2);border-radius:10px;outline:none;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 0 8px #7c5cff88;cursor:pointer;}
-.br2{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-.ab{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:50px;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
-.ab:active{background:rgba(255,255,255,.25);}
-.ab.pl{background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;font-size:14px;box-shadow:0 4px 20px #7c5cff50;padding:13px 28px;}
-.ab.dn{background:rgba(200,40,40,.35);border-color:rgba(220,60,60,.4);}
+/* Bottom panel */
+#panel{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  padding:14px 16px 36px;
+  background:linear-gradient(to top,rgba(0,0,0,.8) 60%,transparent);
+  display:flex;flex-direction:column;gap:10px;align-items:center}
 
-/* Gyro prompt */
-#gp{display:none;position:fixed;inset:0;z-index:300;background:rgba(6,6,14,.93);backdrop-filter:blur(16px);flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;}
-.gi{font-size:48px;}.gt{font-size:20px;font-weight:700;text-align:center;}.gs{font-size:13px;color:var(--mt);text-align:center;line-height:1.6;max-width:280px;}
-.gb{background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;color:#fff;border-radius:14px;padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;}
+/* Lock/Unlock big button */
+#lockBtn{
+  width:66px;height:66px;border-radius:50%;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;cursor:pointer;
+  transition:transform .12s,box-shadow .2s;
+  box-shadow:0 0 30px #7722ff66}
+#lockBtn.edit{background:linear-gradient(135deg,#5533ff,#cc44ee)}
+#lockBtn.locked{background:linear-gradient(135deg,#116611,#44cc44);box-shadow:0 0 30px #22ff6644}
+#lockBtn:active{transform:scale(.88)}
+
+.btnrow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.abtn{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;
+  border-radius:50px;padding:10px 15px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;white-space:nowrap}
+.abtn:active{background:rgba(255,255,255,.22)}
+.abtn.red{background:rgba(180,20,20,.35);border-color:rgba(220,50,50,.35)}
+.abtn.blue{background:rgba(40,80,255,.35);border-color:rgba(80,120,255,.4)}
+
+/* FOV hint line */
+.srow{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);border-radius:50px;
+  padding:7px 16px;width:100%;max-width:340px}
+.srow span{font-size:14px;min-width:18px}
+.srow label{font-size:10px;color:#888;min-width:28px}
+input[type=range]{
+  flex:1;-webkit-appearance:none;height:3px;
+  background:rgba(255,255,255,.2);border-radius:99px;outline:none}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(135deg,#7733ff,#dd55ff);
+  box-shadow:0 0 8px #7733ff66;cursor:pointer}
+
+/* iOS permission overlay */
+#permOvl{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(20px);
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px}
+.picn{font-size:50px}
+.ptitle{font-size:19px;font-weight:800;text-align:center}
+.psub{font-size:13px;color:#888;text-align:center;line-height:1.65;max-width:280px}
+.pbtn{
+  background:linear-gradient(135deg,#4422ee,#aa44dd);
+  border:none;color:#fff;border-radius:14px;padding:14px 30px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 20px #6622ee44}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ══════ SPLASH ══════ -->
 <div id="splash">
-  <div class="s-icon">🖼️</div>
-  <div class="s-title">AR Wall 3D</div>
-  <div class="s-sub">Tempel gambar ke dinding — <b>gambar stay di tempat</b> saat HP digerakkan ke mana saja</div>
+  <div class="slogo">🖼️</div>
+  <h1>AR Wall 3D</h1>
+  <p class="ssub">Tempel gambar ke dinding, atur 4 sudut untuk perspektif, lalu kunci — foto tetap stay saat HP digerakkan.</p>
   <div class="card">
     <div class="clbl">Pilih Gambar</div>
-    <div class="prev-box" onclick="document.getElementById('fi').click()">
-      <div class="ph" id="ph"><span style="font-size:32px">🗂️</span>Ketuk untuk pilih foto</div>
-      <img id="pi"/>
+    <div class="pbox" onclick="document.getElementById('fi').click()">
+      <div class="ph" id="ph"><span class="ei">📂</span>Ketuk untuk pilih foto</div>
+      <img id="prevImg"/>
     </div>
-    <input type="file" id="fi" accept="image/*" onchange="onPick(event)"/>
+    <input type="file" id="fi" accept="image/*" onchange="onFile(event)"/>
   </div>
-  <button class="sbtn" onclick="startAR()">📷 Buka Kamera AR</button>
-  <div class="chips">
-    <div class="chip"><b>✓</b>iOS Safari</div>
-    <div class="chip"><b>✓</b>Android Chrome</div>
-    <div class="chip"><b>✓</b>3D Stay di Tempat</div>
-  </div>
-</div>
-
-<!-- GYRO PERMISSION (iOS) -->
-<div id="gp">
-  <div class="gi">📱</div>
-  <div class="gt">Izin Sensor Gerak</div>
-  <div class="gs">iOS butuh izin giroskop agar gambar bisa stay di tempat saat HP digerakkan.</div>
-  <button class="gb" onclick="requestGyro()">Izinkan Sensor →</button>
-</div>
-
-<!-- AR WORLD -->
-<div id="aw">
-  <video id="cam" autoplay playsinline muted></video>
-  <canvas id="tc"></canvas>
-  <div id="ui">
-    <div id="ch">
-      <div class="cc tl"></div><div class="cc tr"></div>
-      <div class="cc bl"></div><div class="cc br"></div>
-    </div>
-    <div id="tb">
-      <div class="tbt">🖼️ AR Wall 3D</div>
-      <div class="tbb" id="sbadge">PREVIEW</div>
-      <div class="tbc" onclick="stopAR()">✕</div>
-    </div>
-    <div id="sh">Arahkan ke dinding → tekan Tempel di Sini</div>
-    <div id="pb">📌 Gambar ditempel di dinding!</div>
-    <div id="bp">
-      <div class="sr"><label>📐 Ukuran</label><input type="range" id="slsz" min="5" max="95" value="35" oninput="onSlSz(this.value)"/></div>
-      <div class="sr"><label>🔄 Rotasi</label><input type="range" id="slrt" min="0" max="360" value="0" oninput="onSlRt(this.value)"/></div>
-      <div class="br2">
-        <div class="ab" onclick="doFlip()">⇄ Flip</div>
-        <div class="ab pl" id="plbtn" onclick="placeImage()">📌 Tempel di Sini</div>
-        <div class="ab" id="undobtn" style="display:none" onclick="undoPlace()">↩ Lepas</div>
-      </div>
-      <div class="br2">
-        <div class="ab" onclick="savePhoto()">💾 Simpan</div>
-        <div class="ab dn" onclick="stopAR()">✕ Keluar</div>
-      </div>
-    </div>
+  <button class="sbtn" onclick="startAR()">📷 Mulai AR 3D</button>
+  <div class="tags">
+    <div class="tag"><b>✓</b> iOS Safari</div>
+    <div class="tag"><b>✓</b> Android Chrome</div>
+    <div class="tag"><b>✓</b> 4 Corner Warp</div>
+    <div class="tag"><b>✓</b> XYZ Gyro Tracking</div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- ══════ IOS PERMISSION ══════ -->
+<div id="permOvl">
+  <div class="picn">🔄</div>
+  <div class="ptitle">Izin Sensor Gerak</div>
+  <div class="psub">iOS perlu izin untuk akses gyroscope agar gambar bisa stay di dinding saat HP digerakkan.</div>
+  <button class="pbtn" onclick="reqPerm()">Izinkan Sensor</button>
+</div>
+
+<!-- ══════ AR SCREEN ══════ -->
+<div id="ar">
+  <video id="vid" autoplay playsinline muted></video>
+  <canvas id="cv"></canvas>
+
+  <div id="topbar">
+    <div class="tbtitle">🖼️ AR Wall 3D</div>
+    <div class="tbclose" onclick="stopAR()">✕ Keluar</div>
+  </div>
+
+  <div id="modebadge" class="edit">✏️ Mode Edit — Atur 4 Sudut</div>
+  <div id="status">Drag sudut untuk atur perspektif gambar</div>
+
+  <div id="panel">
+    <!-- FOV calibration -->
+    <div class="srow">
+      <span>📐</span>
+      <label>FOV</label>
+      <input type="range" id="fovSlider" min="40" max="100" value="65" oninput="HFOV=this.value*Math.PI/180"/>
+    </div>
+    <!-- action row -->
+    <div class="btnrow">
+      <div class="abtn blue" onclick="resetCorners()">↺ Reset</div>
+      <div class="abtn" onclick="doFlip()">⇄ Flip</div>
+      <div id="lockBtn" class="edit" onclick="toggleLock()" title="Kunci / Edit">📌</div>
+      <div class="abtn" onclick="toggleAxes()">🧭 Sumbu</div>
+      <div class="abtn" onclick="saveSnap()">💾 Simpan</div>
+      <div class="abtn red" onclick="stopAR()">✕</div>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── STATE ──
-let renderer,scene,camera,imgMesh;
-let camStream,animId;
-let isPlaced=false,imgFlipped=false;
-let imgScale=0.7,imgRotOff=0;
-let devA=0,devB=0,devG=0,screenOri=0;
-let gyroOk=false;
-const limg=new Image();
-let userSrc=null;
-const _zee=new THREE.Vector3(0,0,1);
-const _euler=new THREE.Euler();
-const _q0=new THREE.Quaternion();
-const _q1=new THREE.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5));
+/* ════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════ */
+let HFOV = 65 * Math.PI / 180;   // horizontal FOV radians
+const GRID = 14;                  // mesh subdivisions for warp
+const HANDLE_R = 28;              // touch radius for corners
 
-// ── PICK ──
-function onPick(e){
-  const f=e.target.files[0]; if(!f) return;
-  userSrc=URL.createObjectURL(f); limg.src=userSrc;
-  const pi=document.getElementById('pi');
-  pi.src=userSrc; pi.style.display='block';
-  document.getElementById('ph').style.display='none';
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let camStream = null, animId = null;
+let canvas, ctx, W, H;
+
+// Image
+const img = new Image();
+let imgFlip = false;
+
+// Corners: [TL, TR, BR, BL]  {x, y}
+let corners = [];
+
+// 3D anchors: world direction unit vectors [Float32Array(3) x4]
+let anchors = null;   // null = edit mode, array = locked
+
+// Device orientation
+let oAlpha = 0, oBeta = Math.PI * 0.5, oGamma = 0;
+let alphaOff = null, hasOri = false;
+
+// UI
+let showAxes = true;
+let activeHandle = -1;   // which corner is being dragged
+let touchMoveAll = false;
+let moveTouchStart = null, moveCornersStart = null;
+
+/* ════════════════════════════════════════
+   FILE
+════════════════════════════════════════ */
+function onFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f);
+  img.src = url;
+  const pv = document.getElementById('prevImg');
+  pv.src = url; pv.style.display = 'block';
+  document.getElementById('ph').style.display = 'none';
 }
 
-// ── START ──
-async function startAR(){
-  try{
-    camStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false
-    });
-  }catch(err){alert('Kamera error:\n'+err.message);return;}
-  const v=document.getElementById('cam'); v.srcObject=camStream; await v.play();
+/* ════════════════════════════════════════
+   MATH  —  rotation matrix, projection
+════════════════════════════════════════ */
+// W3C DeviceOrientation rotation: Rz(α)·Rx(β)·Ry(γ)
+function buildR(a, b, g) {
+  const ca=Math.cos(a),sa=Math.sin(a);
+  const cb=Math.cos(b),sb=Math.sin(b);
+  const cg=Math.cos(g),sg=Math.sin(g);
+  return [
+    ca*cg-sa*sb*sg, -sa*cb,  ca*sg+sa*sb*cg,
+    sa*cg+ca*sb*sg,  ca*cb,  sa*sg-ca*sb*cg,
+   -cb*sg,           sb,     cb*cg
+  ];
+}
+function mv(M,v){return[M[0]*v[0]+M[1]*v[1]+M[2]*v[2],M[3]*v[0]+M[4]*v[1]+M[5]*v[2],M[6]*v[0]+M[7]*v[1]+M[8]*v[2]]}
+function mt(M){return[M[0],M[3],M[6],M[1],M[4],M[7],M[2],M[5],M[8]]}
+function norm(v){const l=Math.hypot(v[0],v[1],v[2]);return l<1e-10?[0,0,1]:[v[0]/l,v[1]/l,v[2]/l]}
+function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
 
-  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
-    document.getElementById('gp').style.display='flex'; return;
+// Screen orientation compensation angle
+function screenAng(){return((((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360)+360)%360}
+
+// Screen pixel → unit ray in device/camera frame  (camera = -Z axis)
+function px2ray(sx, sy) {
+  const vfov = HFOV*(H/W);
+  let nx = (sx/W*2-1)*Math.tan(HFOV/2);
+  let ny =-(sy/H*2-1)*Math.tan(vfov/2);
+  const sa=screenAng();
+  if(sa===90) {[nx,ny]=[ny,-nx]}
+  else if(sa===270){[nx,ny]=[-ny,nx]}
+  else if(sa===180){nx=-nx;ny=-ny}
+  return norm([nx,ny,-1]);
+}
+
+// Screen pixel → world direction
+function px2world(sx,sy,R){return norm(mv(R,px2ray(sx,sy)))}
+
+// World direction → screen pixel  (returns {x,y,depth} or null if behind)
+function world2px(wd,R){
+  const Rt=mt(R);
+  const dr=mv(Rt,wd);     // device ray
+  if(dr[2]>=-0.01) return null;
+  const dep=-dr[2];
+  const vfov=HFOV*(H/W);
+  let lx=dr[0],ly=dr[1];
+  const sa=screenAng();
+  if(sa===90) {[lx,ly]=[-ly,lx]}
+  else if(sa===270){[lx,ly]=[ly,-lx]}
+  else if(sa===180){lx=-lx;ly=-ly}
+  return{
+    x: lx/dep/Math.tan(HFOV/2)*(W/2)+W/2,
+    y:-ly/dep/Math.tan(vfov/2)*(H/2)+H/2,
+    depth:dep
+  };
+}
+
+/* ════════════════════════════════════════
+   DEVICE ORIENTATION
+════════════════════════════════════════ */
+function onOri(e) {
+  if(e.beta===null) return;
+  const rawA = e.alpha||0;
+  if(alphaOff===null) alphaOff = rawA;
+  const a = ((rawA-alphaOff)+360)%360 * Math.PI/180;
+  const b = e.beta  * Math.PI/180;
+  const g = e.gamma * Math.PI/180;
+  oAlpha=a; oBeta=b; oGamma=g;
+  if(!hasOri){hasOri=true; setStatus('');}
+}
+
+function setupOri(){
+  if(typeof DeviceOrientationEvent!=='undefined' &&
+     typeof DeviceOrientationEvent.requestPermission==='function'){
+    document.getElementById('permOvl').style.display='flex';
+  } else {
+    window.addEventListener('deviceorientation',onOri,true);
+    // Desktop fallback: mouse simulation
+    if(!('ontouchstart' in window)){
+      hasOri=true;
+      document.addEventListener('mousemove',e=>{
+        oAlpha=((e.clientX/W)-0.5)*2.0;
+        oBeta =Math.PI*0.5+((e.clientY/H)-0.5)*1.2;
+        oGamma=0;
+      });
+      setStatus('🖥️ Desktop: gerakkan mouse untuk preview 3D');
+    }
   }
-  window.addEventListener('deviceorientation',onDO,true);
-  window.addEventListener('orientationchange',()=>{screenOri=window.orientation||0;});
-  launch();
 }
 
-async function requestGyro(){
-  document.getElementById('gp').style.display='none';
+async function reqPerm(){
+  document.getElementById('permOvl').style.display='none';
   try{
     const r=await DeviceOrientationEvent.requestPermission();
-    if(r==='granted'){gyroOk=true;window.addEventListener('deviceorientation',onDO,true);}
-  }catch(e){}
-  window.addEventListener('orientationchange',()=>{screenOri=window.orientation||0;});
-  launch();
+    if(r==='granted') window.addEventListener('deviceorientation',onOri,true);
+    else setStatus('⚠️ Izin ditolak');
+  }catch{window.addEventListener('deviceorientation',onOri,true)}
 }
 
-function onDO(e){
-  if(e.alpha===null) return;
-  gyroOk=true; devA=e.alpha||0; devB=e.beta||0; devG=e.gamma||0;
+/* ════════════════════════════════════════
+   CANVAS RESIZE
+════════════════════════════════════════ */
+function resize(){
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  if(!anchors) initCorners();
 }
 
-// ── LAUNCH THREE.JS ──
-function launch(){
-  document.getElementById('splash').style.display='none';
-  document.getElementById('aw').style.display='block';
-  screenOri=window.orientation||0;
-
-  const canvas=document.getElementById('tc');
-  renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  renderer.setClearColor(0x000000,0);
-
-  scene=new THREE.Scene();
-  camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,.01,100);
-  scene.add(camera);
-  scene.add(new THREE.AmbientLight(0xffffff,1.4));
-  const dl=new THREE.DirectionalLight(0xffffff,.6); dl.position.set(1,2,1); scene.add(dl);
-
-  buildMesh();
-  window.addEventListener('resize',onResize);
-  animId=requestAnimationFrame(loop);
+/* ════════════════════════════════════════
+   CORNERS
+════════════════════════════════════════ */
+function initCorners(){
+  const pw=W*0.58, ph=pw*0.62;
+  const cx=W/2, cy=H*0.42;
+  corners=[
+    {x:cx-pw/2, y:cy-ph/2},  // TL
+    {x:cx+pw/2, y:cy-ph/2},  // TR
+    {x:cx+pw/2, y:cy+ph/2},  // BR
+    {x:cx-pw/2, y:cy+ph/2},  // BL
+  ];
 }
 
-// ── BUILD MESH ──
-function buildMesh(){
-  if(imgMesh){scene.remove(imgMesh);imgMesh=null;}
-  let tex;
-  if(userSrc&&limg.complete&&limg.naturalWidth>0){
-    tex=new THREE.Texture(limg); tex.needsUpdate=true;
-  } else if(userSrc){
-    limg.onload=()=>buildMesh(); return;
-  } else {
-    tex=new THREE.CanvasTexture(mkDefault());
+function resetCorners(){
+  anchors=null;
+  imgFlip=false;
+  alphaOff=null;
+  initCorners();
+  setMode('edit');
+  setStatus('Drag sudut untuk atur perspektif');
+}
+
+/* ════════════════════════════════════════
+   LOCK / UNLOCK
+════════════════════════════════════════ */
+function toggleLock(){
+  if(!anchors) lockImage();
+  else unlockImage();
+}
+
+function lockImage(){
+  if(!hasOri&&!('ontouchstart' in window)){
+    // Desktop: allow anyway
   }
-  const aspect=(limg.naturalWidth/limg.naturalHeight)||1.78;
-  const w=imgScale, h=w/aspect;
-  imgMesh=new THREE.Mesh(
-    new THREE.PlaneGeometry(w,h),
-    new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide,transparent:true})
-  );
-  imgMesh.position.set(0,0,-1.5);
-  scene.add(imgMesh);
+  const R=buildR(oAlpha,oBeta,oGamma);
+  anchors=corners.map(c=>px2world(c.x,c.y,R));
+  setMode('locked');
+  setStatus('✅ Dikunci! Gerakkan HP untuk lihat efek 3D');
+  setTimeout(()=>setStatus(''),3500);
 }
 
-// ── LOOP ──
+function unlockImage(){
+  anchors=null;
+  setMode('edit');
+  setStatus('Edit mode — drag sudut untuk atur');
+  setTimeout(()=>setStatus(''),2500);
+}
+
+/* ════════════════════════════════════════
+   PERSPECTIVE WARP DRAW
+════════════════════════════════════════ */
+function drawWarpedImage(cors){
+  if(!img.complete||!img.naturalWidth) return;
+  const iw=img.naturalWidth, ih=img.naturalHeight;
+
+  // bilinear interp of the 4 corners
+  function qp(u,v){
+    const t={x:cors[0].x+(cors[1].x-cors[0].x)*u, y:cors[0].y+(cors[1].y-cors[0].y)*u};
+    const b={x:cors[3].x+(cors[2].x-cors[3].x)*u, y:cors[3].y+(cors[2].y-cors[3].y)*u};
+    return{x:t.x+(b.x-t.x)*v, y:t.y+(b.y-t.y)*v};
+  }
+
+  for(let i=0;i<GRID;i++){
+    for(let j=0;j<GRID;j++){
+      const u0=i/GRID, u1=(i+1)/GRID, v0=j/GRID, v1=(j+1)/GRID;
+      const su0=imgFlip?1-u0:u0, su1=imgFlip?1-u1:u1;
+      const p00=qp(u0,v0),p10=qp(u1,v0),p11=qp(u1,v1),p01=qp(u0,v1);
+      const s00={x:su0*iw,y:v0*ih},s10={x:su1*iw,y:v0*ih};
+      const s11={x:su1*iw,y:v1*ih},s01={x:su0*iw,y:v1*ih};
+      triDraw(img,s00,s10,s11,p00,p10,p11);
+      triDraw(img,s00,s11,s01,p00,p11,p01);
+    }
+  }
+}
+
+function triDraw(img, s0,s1,s2, d0,d1,d2){
+  const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y);
+  if(Math.abs(det)<0.1) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);
+  ctx.closePath();ctx.clip();
+  const id=1/det;
+  const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))*id;
+  const b=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))*id;
+  const c=d0.x-a*s0.x-b*s0.y;
+  const d=((d1.y-d0.y)*(s2.y-s0.y)-(d2.y-d0.y)*(s1.y-s0.y))*id;
+  const e=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))*id;
+  const f=d0.y-d*s0.x-e*s0.y;
+  ctx.transform(a,d,b,e,c,f);
+  ctx.shadowColor='rgba(0,0,0,.5)';
+  ctx.shadowBlur=20;ctx.shadowOffsetX=8;ctx.shadowOffsetY=8;
+  ctx.drawImage(img,0,0);
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════
+   HANDLES DRAW
+════════════════════════════════════════ */
+const CCOLORS=['#ff5555','#55aaff','#55ff88','#ffcc44'];
+const CLABELS=['TL','TR','BR','BL'];
+
+function drawHandles(cors,locked){
+  // Outline of quad
+  ctx.save();
+  ctx.strokeStyle = locked ? 'rgba(80,255,160,.55)' : 'rgba(160,120,255,.7)';
+  ctx.lineWidth=2;
+  ctx.setLineDash(locked?[6,4]:[]);
+  ctx.beginPath();
+  ctx.moveTo(cors[0].x,cors[0].y);
+  ctx.lineTo(cors[1].x,cors[1].y);
+  ctx.lineTo(cors[2].x,cors[2].y);
+  ctx.lineTo(cors[3].x,cors[3].y);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+
+  if(!locked){
+    cors.forEach((c,i)=>{
+      // outer ring
+      ctx.beginPath();ctx.arc(c.x,c.y,22,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,.45)';ctx.fill();
+      // colored dot
+      ctx.beginPath();ctx.arc(c.x,c.y,14,0,Math.PI*2);
+      ctx.fillStyle=CCOLORS[i];
+      ctx.shadowColor=CCOLORS[i];ctx.shadowBlur=14;
+      ctx.fill();ctx.shadowBlur=0;
+      // white border
+      ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2.5;ctx.stroke();
+      // label
+      ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(CLABELS[i],c.x,c.y);
+    });
+  }
+}
+
+/* ════════════════════════════════════════
+   AXES DRAW
+════════════════════════════════════════ */
+function drawAxes(cors){
+  const cx=(cors[0].x+cors[1].x+cors[2].x+cors[3].x)/4;
+  const cy=(cors[0].y+cors[1].y+cors[2].y+cors[3].y)/4;
+
+  // X = right (TR-TL + BR-BL direction)
+  const xv={x:(cors[1].x-cors[0].x+cors[2].x-cors[3].x)/2, y:(cors[1].y-cors[0].y+cors[2].y-cors[3].y)/2};
+  // Y = down (BL-TL + BR-TR direction)
+  const yv={x:(cors[3].x-cors[0].x+cors[2].x-cors[1].x)/2, y:(cors[3].y-cors[0].y+cors[2].y-cors[1].y)/2};
+
+  const xl=Math.hypot(xv.x,xv.y)||1, yl=Math.hypot(yv.x,yv.y)||1;
+  const xn={x:xv.x/xl,y:xv.y/xl}, yn={x:yv.x/yl,y:yv.y/yl};
+  // Z = cross product projected to screen (inward direction)
+  const zn={x:-(xn.x*0.6+yn.x*0.6),y:-(xn.y*0.6+yn.y*0.6)};
+
+  const S=52;
+  drawArrow(cx,cy, xn.x*S,xn.y*S, '#ff4444','X');
+  drawArrow(cx,cy, yn.x*S,yn.y*S, '#44ff66','Y');
+  drawArrow(cx,cy, zn.x*S,zn.y*S, '#4499ff','Z');
+}
+
+function drawArrow(ox,oy,dx,dy,col,lbl){
+  const len=Math.hypot(dx,dy); if(len<1)return;
+  const ang=Math.atan2(dy,dx);
+  ctx.save();
+  ctx.strokeStyle=col; ctx.fillStyle=col;
+  ctx.lineWidth=3; ctx.lineCap='round';
+  // shaft
+  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+dx,oy+dy);ctx.stroke();
+  // arrowhead
+  const al=12,aw=0.45;
+  ctx.beginPath();
+  ctx.moveTo(ox+dx,oy+dy);
+  ctx.lineTo(ox+dx-al*Math.cos(ang-aw),oy+dy-al*Math.sin(ang-aw));
+  ctx.lineTo(ox+dx-al*Math.cos(ang+aw),oy+dy-al*Math.sin(ang+aw));
+  ctx.closePath();ctx.fill();
+  // label with bg
+  const lx=ox+dx+14*Math.cos(ang), ly=oy+dy+14*Math.sin(ang);
+  ctx.font='bold 14px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(lx-9,ly-9,18,18);
+  ctx.fillStyle=col; ctx.fillText(lbl,lx,ly);
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════
+   MAIN LOOP
+════════════════════════════════════════ */
 function loop(){
-  // Update camera from gyro
-  if(gyroOk){
-    _euler.set(THREE.MathUtils.degToRad(devB),THREE.MathUtils.degToRad(devA),THREE.MathUtils.degToRad(-devG),'YXZ');
-    camera.quaternion.setFromEuler(_euler);
-    camera.quaternion.multiply(_q1);
-    camera.quaternion.multiply(_q0.setFromAxisAngle(_zee,-THREE.MathUtils.degToRad(screenOri)));
+  ctx.clearRect(0,0,W,H);
+  const R=buildR(oAlpha,oBeta,oGamma);
+
+  let drawCors;
+  if(anchors){
+    // Project world directions → screen pixels
+    drawCors = anchors.map(wd=>world2px(wd,R));
+    // If any corner behind camera, skip drawing
+    if(drawCors.some(p=>p===null)){
+      // show partial guide
+      drawOffBehind();
+      animId=requestAnimationFrame(loop); return;
+    }
+  } else {
+    drawCors = corners;
   }
 
-  // Pre-place: follow camera center
-  if(!isPlaced&&imgMesh){
-    const dir=new THREE.Vector3(0,0,-1.5).applyQuaternion(camera.quaternion);
-    imgMesh.position.copy(dir);
-    imgMesh.quaternion.copy(camera.quaternion);
-    if(imgRotOff!==0){
-      const qe=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),imgRotOff*Math.PI/180);
-      imgMesh.quaternion.multiply(qe);
-    }
-    if(imgFlipped){
-      const qf=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI);
-      imgMesh.quaternion.multiply(qf);
-    }
-  }
-  // After place: imgMesh stays frozen in world space — nothing to update
+  // Draw warped image
+  drawWarpedImage(drawCors);
 
-  renderer.render(scene,camera);
+  // Overlay: handles (edit) or outline+axes (locked)
+  drawHandles(drawCors, !!anchors);
+  if(showAxes) drawAxes(drawCors);
+
   animId=requestAnimationFrame(loop);
 }
 
-// ── PLACE ──
-function placeImage(){
-  if(!imgMesh) return;
-  isPlaced=true;
-  const sb=document.getElementById('sbadge');
-  sb.textContent='TEMPEL ✓'; sb.style.cssText='background:rgba(40,200,100,.3);border-color:rgba(60,220,120,.4);color:#6fffa0;border-radius:50px;padding:4px 12px;font-size:11px;font-weight:600;';
-  document.getElementById('sh').textContent='✅ Gerakkan HP — gambar tetap di tempat!';
-  document.getElementById('ch').style.opacity='0';
-  document.getElementById('plbtn').style.display='none';
-  document.getElementById('undobtn').style.display='flex';
-  const pb=document.getElementById('pb'); pb.style.display='block';
-  setTimeout(()=>{pb.style.transition='opacity .8s';pb.style.opacity='0';setTimeout(()=>{pb.style.display='none';pb.style.opacity='1';pb.style.transition='';},900);},2500);
+function drawOffBehind(){
+  ctx.save();
+  ctx.fillStyle='rgba(255,200,80,.85)';
+  ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('↩ Gambar ada di belakang kamu', W/2, H*0.5);
+  ctx.restore();
 }
 
-function undoPlace(){
-  isPlaced=false;
-  const sb=document.getElementById('sbadge'); sb.textContent='PREVIEW'; sb.style.cssText='';
-  sb.className='tbb';
-  document.getElementById('sh').textContent='Arahkan ke dinding → tekan Tempel di Sini';
-  document.getElementById('ch').style.opacity='1';
-  document.getElementById('plbtn').style.display='flex';
-  document.getElementById('undobtn').style.display='none';
+/* ════════════════════════════════════════
+   TOUCH / MOUSE HANDLING
+════════════════════════════════════════ */
+function distPt(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function nearestCorner(x,y){
+  let best=-1,bd=9999;
+  corners.forEach((c,i)=>{const d=distPt({x,y},c);if(d<bd){bd=d;best=i}});
+  return bd<HANDLE_R*2?best:-1;
 }
 
-// ── CONTROLS ──
-function onSlSz(v){ imgScale=.15+(v/100)*2.5; if(imgMesh){const a=(limg.naturalWidth/limg.naturalHeight)||1.78;imgMesh.geometry.dispose();imgMesh.geometry=new THREE.PlaneGeometry(imgScale,imgScale/a);} }
-function onSlRt(v){ imgRotOff=parseFloat(v); }
-function doFlip(){ imgFlipped=!imgFlipped; }
+// Touch events
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(anchors) return;
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    const tx=t.clientX, ty=t.clientY;
+    activeHandle=nearestCorner(tx,ty);
+    if(activeHandle===-1){
+      // drag all corners (move whole image)
+      touchMoveAll=true;
+      moveTouchStart={x:tx,y:ty};
+      moveCornersStart=corners.map(c=>({...c}));
+    }
+  } else if(e.touches.length===2){
+    activeHandle=-1;touchMoveAll=false;
+  }
+},{passive:false});
 
-// ── SAVE ──
-function savePhoto(){
-  const sc=document.createElement('canvas'); sc.width=window.innerWidth; sc.height=window.innerHeight;
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(anchors) return;
+  if(activeHandle>=0&&e.touches.length===1){
+    corners[activeHandle]={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  } else if(touchMoveAll&&e.touches.length===1){
+    const dx=e.touches[0].clientX-moveTouchStart.x;
+    const dy=e.touches[0].clientY-moveTouchStart.y;
+    corners=moveCornersStart.map(c=>({x:c.x+dx,y:c.y+dy}));
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  if(e.touches.length===0){activeHandle=-1;touchMoveAll=false;}
+},{passive:false});
+
+// Mouse events (desktop)
+canvas.addEventListener('mousedown',e=>{
+  if(anchors) return;
+  activeHandle=nearestCorner(e.clientX,e.clientY);
+  if(activeHandle===-1){
+    touchMoveAll=true;
+    moveTouchStart={x:e.clientX,y:e.clientY};
+    moveCornersStart=corners.map(c=>({...c}));
+  }
+});
+canvas.addEventListener('mousemove',e=>{
+  if(anchors) return;
+  if(activeHandle>=0) corners[activeHandle]={x:e.clientX,y:e.clientY};
+  else if(touchMoveAll){
+    const dx=e.clientX-moveTouchStart.x, dy=e.clientY-moveTouchStart.y;
+    corners=moveCornersStart.map(c=>({x:c.x+dx,y:c.y+dy}));
+  }
+});
+canvas.addEventListener('mouseup',()=>{activeHandle=-1;touchMoveAll=false;});
+
+/* ════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════ */
+function setMode(m){
+  const lb=document.getElementById('lockBtn');
+  const mb=document.getElementById('modebadge');
+  if(m==='edit'){
+    lb.textContent='📌';lb.className='edit';
+    mb.textContent='✏️ Mode Edit — Drag Sudut';mb.className='edit';
+  } else {
+    lb.textContent='🔓';lb.className='locked';
+    mb.textContent='🔒 Terkunci — 3D Tracking Aktif';mb.className='locked';
+  }
+}
+
+function setStatus(msg){
+  const el=document.getElementById('status');
+  el.textContent=msg; el.style.opacity=msg?'1':'0';
+}
+
+function doFlip(){imgFlip=!imgFlip}
+function toggleAxes(){showAxes=!showAxes}
+
+async function saveSnap(){
+  const sc=document.createElement('canvas');
+  sc.width=W;sc.height=H;
   const sx=sc.getContext('2d');
-  sx.drawImage(document.getElementById('cam'),0,0,sc.width,sc.height);
-  renderer.render(scene,camera);
-  sx.drawImage(document.getElementById('tc'),0,0);
-  const a=document.createElement('a'); a.download='ar-3d.jpg'; a.href=sc.toDataURL('image/jpeg',.93); a.click();
+  sx.drawImage(document.getElementById('vid'),0,0,W,H);
+  sx.drawImage(canvas,0,0);
+  const link=document.createElement('a');
+  link.download='ar-wall-3d.jpg';
+  link.href=sc.toDataURL('image/jpeg',.93);
+  link.click();
 }
 
-// ── RESIZE ──
-function onResize(){
-  camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
+/* ════════════════════════════════════════
+   START / STOP
+════════════════════════════════════════ */
+async function startAR(){
+  if(!img.src) img.src=buildDefaultImg();
+
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+      audio:false
+    });
+  }catch(err){alert('Kamera tidak bisa diakses:\n'+err.message);return}
+
+  const vid=document.getElementById('vid');
+  vid.srcObject=camStream;
+  await vid.play();
+
+  document.getElementById('splash').style.display='none';
+  document.getElementById('ar').style.display='block';
+
+  canvas=document.getElementById('cv');
+  ctx=canvas.getContext('2d');
+
+  resize();
+  window.addEventListener('resize',resize);
+  screen.orientation&&screen.orientation.addEventListener('change',()=>setTimeout(resize,300));
+
+  setMode('edit');
+  setStatus('Drag sudut untuk atur perspektif gambar');
+  setupOri();
+
+  animId=requestAnimationFrame(loop);
 }
 
-// ── STOP ──
 function stopAR(){
-  cancelAnimationFrame(animId); animId=null;
-  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
-  window.removeEventListener('deviceorientation',onDO,true);
-  window.removeEventListener('resize',onResize);
-  if(renderer){renderer.dispose();renderer=null;}
-  scene=null;camera=null;imgMesh=null;isPlaced=false;gyroOk=false;imgFlipped=false;imgScale=.7;imgRotOff=0;
-  document.getElementById('aw').style.display='none';
+  cancelAnimationFrame(animId);animId=null;
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  window.removeEventListener('deviceorientation',onOri,true);
+  window.removeEventListener('resize',resize);
+  document.getElementById('ar').style.display='none';
   document.getElementById('splash').style.display='flex';
-  document.getElementById('sbadge').textContent='PREVIEW'; document.getElementById('sbadge').style.cssText='';
-  document.getElementById('sh').textContent='Arahkan ke dinding → tekan Tempel di Sini';
-  document.getElementById('ch').style.opacity='1';
-  document.getElementById('plbtn').style.display='flex';
-  document.getElementById('undobtn').style.display='none';
-  document.getElementById('slsz').value=35; document.getElementById('slrt').value=0;
+  anchors=null;hasOri=false;alphaOff=null;imgFlip=false;
+  setMode('edit');
 }
 
-// ── DEFAULT IMG ──
-function mkDefault(){
-  const c=document.createElement('canvas'); c.width=800; c.height=450;
+/* ════════════════════════════════════════
+   DEFAULT IMAGE
+════════════════════════════════════════ */
+function buildDefaultImg(){
+  const c=document.createElement('canvas');
+  c.width=900;c.height=560;
   const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,800,450);
-  g.addColorStop(0,'#3a1ddd'); g.addColorStop(.5,'#a020dd'); g.addColorStop(1,'#dd3060');
-  x.fillStyle=g; x.fillRect(0,0,800,450);
-  x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=1;
-  for(let i=0;i<800;i+=50){x.beginPath();x.moveTo(i,0);x.lineTo(i,450);x.stroke();}
-  for(let i=0;i<450;i+=50){x.beginPath();x.moveTo(0,i);x.lineTo(800,i);x.stroke();}
-  x.fillStyle='rgba(255,255,255,.92)'; x.font='bold 68px Helvetica'; x.textAlign='center'; x.fillText('AR 3D IMAGE',400,210);
-  x.font='24px Helvetica'; x.fillStyle='rgba(255,255,255,.55)'; x.fillText('Pilih foto dari menu utama',400,270);
-  return c;
+  const g=x.createLinearGradient(0,0,900,560);
+  g.addColorStop(0,'#2211cc');g.addColorStop(.5,'#aa22dd');g.addColorStop(1,'#ff5522');
+  x.fillStyle=g;x.fillRect(0,0,900,560);
+  // grid
+  x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=1;
+  for(let i=0;i<900;i+=45){x.beginPath();x.moveTo(i,0);x.lineTo(i,560);x.stroke()}
+  for(let i=0;i<560;i+=45){x.beginPath();x.moveTo(0,i);x.lineTo(900,i);x.stroke()}
+  // frame
+  x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=6;x.strokeRect(18,18,864,524);
+  // text
+  x.fillStyle='rgba(255,255,255,.9)';x.font='bold 72px Arial';x.textAlign='center';
+  x.fillText('AR IMAGE',450,260);
+  x.font='22px Arial';x.fillStyle='rgba(255,255,255,.5)';
+  x.fillText('Pilih foto dari splash screen',450,320);
+  return c.toDataURL();
 }
 </script>
 </body>
