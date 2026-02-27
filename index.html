@@ -227,7 +227,7 @@ let RX=0, RY=0, RZ=0;
 let SZ=120;
 
 // Gyro
-let oA=0, oB=Math.PI*0.5, oG=0;
+let oA=0, oB=0, oG=0;
 let alphaOff=null, hasOri=false;
 
 // Locked state: true = locked, null = edit
@@ -264,6 +264,14 @@ function onSlider(){
 function v(id){return document.getElementById(id).value}
 function sv(id,val){document.getElementById(id).textContent=val}
 function setSlider(id,val){document.getElementById(id).value=val}
+function ensureImageReady(){
+  return new Promise(resolve=>{
+    if(img.complete&&img.naturalWidth)return resolve();
+    const done=()=>resolve();
+    img.addEventListener('load',done,{once:true});
+    img.addEventListener('error',done,{once:true});
+  });
+}
 
 /* ══════════════════════════════════
    MATH
@@ -579,7 +587,7 @@ function setupOri(){
       hasOri=true;
       document.addEventListener('mousemove',e=>{
         oA=((e.clientX/W)-0.5)*1.8;
-        oB=Math.PI*0.5+((e.clientY/H)-0.5)*1.1;
+        oB=((e.clientY/H)-0.5)*1.1;
         oG=0;
       });
     }
@@ -604,6 +612,7 @@ function resize(){
 
 async function startAR(){
   if(!img.src||img.src===window.location.href)img.src=buildDefaultImg();
+  await ensureImageReady();
   try{
     camStream=await navigator.mediaDevices.getUserMedia({
       video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
