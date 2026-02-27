@@ -8,118 +8,39 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 body{background:#06060f;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;width:100vw;height:100dvh}
 
-/* ────── SPLASH ────── */
-#splash{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  height:100dvh;padding:28px;gap:18px;
-  background:radial-gradient(ellipse 80% 50% at 50% 0%,#180a40,#06060f 70%)}
+#splash{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100dvh;padding:28px;gap:18px;background:radial-gradient(ellipse 80% 50% at 50% 0%,#180a40,#06060f 70%)}
 .slogo{font-size:52px;filter:drop-shadow(0 0 26px #9955ffaa)}
-h1{font-size:25px;font-weight:900;letter-spacing:-0.8px;text-align:center;
-  background:linear-gradient(130deg,#bb88ff 20%,#ff66cc 80%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.ssub{font-size:13px;color:#666;text-align:center;line-height:1.65;max-width:300px}
+h1{font-size:25px;font-weight:900;letter-spacing:-0.8px;text-align:center;background:linear-gradient(130deg,#bb88ff 20%,#ff66cc 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ssub{font-size:13px;color:#666;text-align:center;line-height:1.65;max-width:320px}
 .card{background:#0e0e1c;border:1px solid #1e1e38;border-radius:20px;padding:16px;width:100%;max-width:350px}
 .clbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
-.pbox{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;
-  background:#0a0a18;border:2px dashed #1e1e38;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s}
+.pbox{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#0a0a18;border:2px dashed #1e1e38;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s}
 .pbox:active{border-color:#9955ff}
 .pbox img{width:100%;height:100%;object-fit:cover;display:none}
 .ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:#333;font-size:11px}
 .ph .ei{font-size:28px}
 input[type=file]{display:none}
-.sbtn{background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
-  border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;
-  width:100%;max-width:350px;box-shadow:0 6px 28px #6622ee44;transition:transform .1s,opacity .2s}
+.sbtn{background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;width:100%;max-width:350px;box-shadow:0 6px 28px #6622ee44;transition:transform .1s,opacity .2s}
 .sbtn:active{transform:scale(.97);opacity:.88}
-.tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.tag{background:#0e0e1c;border:1px solid #1e1e38;border-radius:50px;padding:5px 12px;font-size:11px;color:#666}
-.tag b{color:#99aaff;font-weight:600}
 
-/* ────── AR SCREEN ────── */
 #ar{display:none;position:fixed;inset:0;z-index:100}
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-#cv{position:absolute;inset:0;width:100%;height:100%;z-index:2}
-
-/* Topbar */
-#topbar{position:absolute;top:0;left:0;right:0;z-index:10;
-  padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none}
+#topbar{position:absolute;top:0;left:0;right:0;z-index:10;padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent)}
 .tbtitle{font-size:14px;font-weight:700}
-.tbclose{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.14);color:#fff;
-  border-radius:50px;padding:7px 16px;font-size:12px;cursor:pointer;pointer-events:all}
-
-/* Status badge */
-#badge{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:10;
-  padding:7px 18px;border-radius:50px;font-size:12px;font-weight:700;
-  backdrop-filter:blur(12px);white-space:nowrap;pointer-events:none;transition:all .3s}
-#badge.edit{background:rgba(255,170,0,.18);border:1px solid rgba(255,200,0,.35);color:#ffd060}
-#badge.locked{background:rgba(0,200,100,.18);border:1px solid rgba(0,220,110,.35);color:#44ffaa}
-
-/* ────── BOTTOM PANEL ────── */
-#panel{position:absolute;bottom:0;left:0;right:0;z-index:10;
-  padding:10px 12px 30px;
-  background:linear-gradient(to top,rgba(0,0,0,.88) 70%,transparent);
-  display:flex;flex-direction:column;gap:7px}
-
-.sec{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1.5px;
-  display:flex;align-items:center;gap:8px;padding:2px 2px 0}
-.sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
-
-.srow{display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
-  border-radius:10px;padding:7px 10px}
-.axis{font-size:12px;font-weight:900;min-width:20px;text-align:center;letter-spacing:.5px}
-.axis.x{color:#ff5555}.axis.y{color:#55ff88}.axis.z{color:#5599ff}.axis.s{color:#ffaa44}
-.val{font-size:11px;min-width:40px;text-align:right;font-variant-numeric:tabular-nums;color:#666}
-
-input[type=range]{flex:1;-webkit-appearance:none;appearance:none;
-  height:4px;border-radius:99px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
-  border:2.5px solid rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer}
-.rx{background:linear-gradient(to right,#ff555533,#ff5555)}
-.ry{background:linear-gradient(to right,#55ff8833,#55ff88)}
-.rz{background:linear-gradient(to right,#5599ff33,#5599ff)}
-.rs{background:linear-gradient(to right,#ffaa4433,#ffaa44)}
-.rx::-webkit-slider-thumb{background:#ff5555}
-.ry::-webkit-slider-thumb{background:#55ff88}
-.rz::-webkit-slider-thumb{background:#5599ff}
-.rs::-webkit-slider-thumb{background:#ffaa44}
-
-/* Buttons */
-.btnrow{display:flex;gap:7px;align-items:center;justify-content:center;padding-top:2px}
-.abtn{background:rgba(255,255,255,.09);backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.12);color:#fff;
-  border-radius:50px;padding:10px 13px;font-size:12px;font-weight:600;
-  cursor:pointer;transition:background .15s;white-space:nowrap;flex:1;text-align:center}
-.abtn:active{background:rgba(255,255,255,.2)}
+.tbclose{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:50px;padding:7px 16px;font-size:12px;cursor:pointer}
+#badge{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:10;padding:7px 18px;border-radius:50px;font-size:12px;font-weight:700;background:rgba(255,170,0,.18);border:1px solid rgba(255,200,0,.35);color:#ffd060;backdrop-filter:blur(12px);white-space:nowrap}
+#panel{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:10px 12px 28px;background:linear-gradient(to top,rgba(0,0,0,.88) 70%,transparent)}
+.btnrow{display:flex;gap:8px}
+.abtn{background:rgba(255,255,255,.09);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:50px;padding:11px 13px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex:1;text-align:center}
 .abtn.red{background:rgba(180,20,20,.3);border-color:rgba(220,50,50,.3)}
-#lockBtn{flex:1.5;border-radius:50px;border:none;cursor:pointer;
-  font-size:12px;font-weight:800;padding:11px 10px;
-  transition:transform .1s,box-shadow .2s;color:#fff}
-#lockBtn.edit{background:linear-gradient(135deg,#5533ff,#cc44ee);box-shadow:0 0 18px #7722ff44}
-#lockBtn.locked{background:linear-gradient(135deg,#116611,#44cc44);box-shadow:0 0 18px #22ff6633}
-#lockBtn:active{transform:scale(.92)}
-
-/* iOS permission */
-#permOvl{display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.88);backdrop-filter:blur(20px);
-  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px}
-.picn{font-size:50px}.ptitle{font-size:19px;font-weight:800;text-align:center}
-.psub{font-size:13px;color:#888;text-align:center;line-height:1.65;max-width:280px}
-.pbtn{background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
-  border-radius:14px;padding:14px 30px;font-size:15px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
-
-<!-- SPLASH -->
 <div id="splash">
   <div class="slogo">🖼️</div>
   <h1>AR Wall 3D</h1>
-  <p class="ssub">Atur posisi & rotasi foto ke dinding lewat slider X Y Z, lalu kunci — foto stay saat HP digerakkan.</p>
+  <p class="ssub">Tekan Mulai AR, lalu geser 4 titik sudut untuk menempelkan foto persegi ke sudut dinding.</p>
   <div class="card">
     <div class="clbl">Pilih Foto (Persegi)</div>
     <div class="pbox" onclick="document.getElementById('fi').click()">
@@ -129,83 +50,20 @@ input[type=range]::-webkit-slider-thumb{
     <input type="file" id="fi" accept="image/*" onchange="onFile(event)"/>
   </div>
   <button class="sbtn" onclick="startAR()">📷 Mulai AR</button>
-  <div class="tags">
-    <div class="tag"><b>✓</b> iOS Safari</div>
-    <div class="tag"><b>✓</b> Android Chrome</div>
-    <div class="tag"><b>✓</b> Position XYZ</div>
-    <div class="tag"><b>✓</b> Rotation XYZ</div>
-  </div>
 </div>
 
-<!-- IOS PERMISSION -->
-<div id="permOvl">
-  <div class="picn">🔄</div>
-  <div class="ptitle">Izin Sensor Gerak</div>
-  <div class="psub">iOS perlu izin gyroscope agar foto bisa stay di dinding saat HP digerakkan.</div>
-  <button class="pbtn" onclick="reqPerm()">Izinkan Sensor</button>
-</div>
-
-<!-- AR -->
 <div id="ar">
   <video id="vid" autoplay playsinline muted></video>
   <canvas id="cv"></canvas>
-
   <div id="topbar">
     <div class="tbtitle">🖼️ AR Wall 3D</div>
     <div class="tbclose" onclick="stopAR()">✕ Keluar</div>
   </div>
-  <div id="badge" class="edit">✏️ Mode Edit</div>
-
+  <div id="badge">Geser 4 titik sudut untuk atur foto</div>
   <div id="panel">
-    <!-- POSITION -->
-    <div class="sec">📍 Posisi</div>
-    <div class="srow">
-      <div class="axis x">X</div>
-      <input type="range" class="rx" id="px" min="-100" max="100" value="0" oninput="onSlider()"/>
-      <div class="val" id="vpx">0</div>
-    </div>
-    <div class="srow">
-      <div class="axis y">Y</div>
-      <input type="range" class="ry" id="py" min="-100" max="100" value="0" oninput="onSlider()"/>
-      <div class="val" id="vpy">0</div>
-    </div>
-    <div class="srow">
-      <div class="axis z">Z</div>
-      <input type="range" class="rz" id="pz" min="10" max="300" value="80" oninput="onSlider()"/>
-      <div class="val" id="vpz">80</div>
-    </div>
-
-    <!-- ROTATION -->
-    <div class="sec">🔄 Rotasi</div>
-    <div class="srow">
-      <div class="axis x">X</div>
-      <input type="range" class="rx" id="rrx" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vrx">0°</div>
-    </div>
-    <div class="srow">
-      <div class="axis y">Y</div>
-      <input type="range" class="ry" id="rry" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vry">0°</div>
-    </div>
-    <div class="srow">
-      <div class="axis z">Z</div>
-      <input type="range" class="rz" id="rrz" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vrz">0°</div>
-    </div>
-
-    <!-- SIZE -->
-    <div class="sec">📐 Ukuran</div>
-    <div class="srow">
-      <div class="axis s">S</div>
-      <input type="range" class="rs" id="sz" min="10" max="400" value="120" oninput="onSlider()"/>
-      <div class="val" id="vsz">120</div>
-    </div>
-
-    <!-- BUTTONS -->
     <div class="btnrow">
-      <div class="abtn" onclick="resetAll()">↺ Reset</div>
+      <div class="abtn" onclick="resetCorners()">↺ Reset Titik</div>
       <div class="abtn" onclick="doFlip()">⇄ Flip</div>
-      <button id="lockBtn" class="edit" onclick="toggleLock()">📌 Kunci</button>
       <div class="abtn" onclick="saveSnap()">💾 Simpan</div>
       <div class="abtn red" onclick="stopAR()">✕</div>
     </div>
@@ -213,13 +71,14 @@ input[type=range]::-webkit-slider-thumb{
 </div>
 
 <script>
-/* ══════════════════════════════════
-   STATE
-══════════════════════════════════ */
 let canvas, ctx, W, H;
 let camStream = null, animId = null;
 const img = new Image();
 let imgFlip = false;
+let corners = [];
+let dragIndex = -1;
+let dragBound = false;
+const MESH = 16;
 
 // Current slider values
 let PX=0, PY=0, PZ=80;
@@ -250,16 +109,13 @@ function onFile(e){
   document.getElementById('ph').style.display='none';
 }
 
-/* ══════════════════════════════════
-   SLIDERS → sync state & labels
-══════════════════════════════════ */
-function onSlider(){
-  PX=+v('px'); PY=+v('py'); PZ=+v('pz');
-  RX=+v('rrx'); RY=+v('rry'); RZ=+v('rrz');
-  SZ=+v('sz');
-  sv('vpx',PX); sv('vpy',PY); sv('vpz',PZ);
-  sv('vrx',RX+'°'); sv('vry',RY+'°'); sv('vrz',RZ+'°');
-  sv('vsz',SZ);
+function ensureImageReady(){
+  return new Promise(resolve=>{
+    if(img.complete&&img.naturalWidth)return resolve();
+    const done=()=>resolve();
+    img.addEventListener('load',done,{once:true});
+    img.addEventListener('error',done,{once:true});
+  });
 }
 function v(id){return document.getElementById(id).value}
 function sv(id,val){document.getElementById(id).textContent=val}
@@ -278,69 +134,59 @@ function ensureImageReady(){
 ══════════════════════════════════ */
 function rot3(deg){return deg*Math.PI/180}
 
-function makeRx(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[1,0,0,0,c,-s,0,s,c]}
-function makeRy(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[c,0,s,0,1,0,-s,0,c]}
-function makeRz(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[c,-s,0,s,c,0,0,0,1]}
-function mm(A,B){
-  const R=[];
-  for(let i=0;i<3;i++)for(let j=0;j<3;j++)
-    R[i*3+j]=A[i*3]*B[j]+A[i*3+1]*B[3+j]+A[i*3+2]*B[6+j];
-  return R;
-}
-function mv(M,v){return[M[0]*v[0]+M[1]*v[1]+M[2]*v[2],M[3]*v[0]+M[4]*v[1]+M[5]*v[2],M[6]*v[0]+M[7]*v[1]+M[8]*v[2]]}
-function mt(M){return[M[0],M[3],M[6],M[1],M[4],M[7],M[2],M[5],M[8]]}
-
-// Device rotation matrix (W3C spec)
-function devR(a,b,g){
-  const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
-  return[ca*cg-sa*sb*sg,-sa*cb,ca*sg+sa*sb*cg,
-         sa*cg+ca*sb*sg, ca*cb,sa*sg-ca*sb*cg,
-        -cb*sg,          sb,   cb*cg];
+function resetCorners(){
+  const s=Math.min(W,H)*0.56;
+  const cx=W/2, cy=H/2;
+  corners=[
+    {x:cx-s/2,y:cy-s/2}, // TL
+    {x:cx+s/2,y:cy-s/2}, // TR
+    {x:cx+s/2,y:cy+s/2}, // BR
+    {x:cx-s/2,y:cy+s/2}  // BL
+  ];
 }
 
-function screenAng(){return((((screen.orientation&&screen.orientation.angle)||window.orientation||0)+360)%360)}
-
-// 3D world point → 2D screen pixel
-function w2s(wx,wy,wz,DR){
-  const Rt=mt(DR);
-  const d=mv(Rt,[wx,wy,wz]);
-  if(d[2]>=-0.01)return null;
-  const dep=-d[2];
-  const vfov=HFOV*(H/W);
-  let lx=d[0]/dep, ly=d[1]/dep;
-  const sa=screenAng();
-  if(sa===90){const t=lx;lx=-ly;ly=t}
-  else if(sa===270){const t=lx;lx=ly;ly=-t}
-  else if(sa===180){lx=-lx;ly=-ly}
-  return{x:lx/Math.tan(HFOV/2)*(W/2)+W/2, y:-ly/Math.tan(vfov/2)*(H/2)+H/2, dep};
+function clampPoint(p){
+  p.x=Math.max(0,Math.min(W,p.x));
+  p.y=Math.max(0,Math.min(H,p.y));
 }
 
-/* ══════════════════════════════════
-   BUILD QUAD
-   Returns 4 screen points [TL,TR,BR,BL] or null
-══════════════════════════════════ */
-function buildQuad(DR, px,py,pz, rx,ry,rz, sz){
-  const h=sz*0.005;            // half-size in world units
-  // Local corners: flat in XY plane, Z=0
-  const lc=[[-h,-h,0],[h,-h,0],[h,h,0],[-h,h,0]];
-  // Object rotation: Rz·Ry·Rx
-  const OM=mm(mm(makeRz(rz),makeRy(ry)),makeRx(rx));
-  // Object position in camera-relative world space
-  // Camera looks in -Z; object placed at (px*0.01, -py*0.01, -pz*0.01)
-  const op=[px*0.01, -py*0.01, -pz*0.01];
-  const pts=[];
-  for(const c of lc){
-    const rc=mv(OM,c);
-    const sp=w2s(rc[0]+op[0],rc[1]+op[1],rc[2]+op[2], DR);
-    if(!sp)return null;
-    pts.push(sp);
+function getPointFromEvent(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
+
+function nearestCorner(p){
+  let best=-1, d=1e9;
+  for(let i=0;i<corners.length;i++){
+    const dx=corners[i].x-p.x, dy=corners[i].y-p.y;
+    const dd=dx*dx+dy*dy;
+    if(dd<d){d=dd;best=i}
   }
-  return pts;
+  return d<=45*45?best:-1;
 }
 
-/* ══════════════════════════════════
-   DRAW WARPED IMAGE (perspective mesh)
-══════════════════════════════════ */
+function bindDrag(){
+  if(dragBound)return;
+  dragBound=true;
+  canvas.addEventListener('pointerdown',e=>{
+    const p=getPointFromEvent(e);
+    const i=nearestCorner(p);
+    if(i===-1)return;
+    dragIndex=i;
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(dragIndex===-1)return;
+    const p=getPointFromEvent(e);
+    corners[dragIndex].x=p.x;
+    corners[dragIndex].y=p.y;
+    clampPoint(corners[dragIndex]);
+  });
+  const up=()=>{dragIndex=-1};
+  canvas.addEventListener('pointerup',up);
+  canvas.addEventListener('pointercancel',up);
+}
+
 function drawWarp(pts){
   if(!img.complete||!img.naturalWidth)return;
   const iw=img.naturalWidth, ih=img.naturalHeight;
@@ -350,15 +196,12 @@ function drawWarp(pts){
     const b={x:pts[3].x+(pts[2].x-pts[3].x)*su,y:pts[3].y+(pts[2].y-pts[3].y)*su};
     return{x:t.x+(b.x-t.x)*v,y:t.y+(b.y-t.y)*v};
   }
-  for(let i=0;i<MESH;i++){
-    for(let j=0;j<MESH;j++){
-      const u0=i/MESH,u1=(i+1)/MESH,v0=j/MESH,v1=(j+1)/MESH;
-      const p00=qp(u0,v0),p10=qp(u1,v0),p11=qp(u1,v1),p01=qp(u0,v1);
-      const s00={x:u0*iw,y:v0*ih},s10={x:u1*iw,y:v0*ih};
-      const s11={x:u1*iw,y:v1*ih},s01={x:u0*iw,y:v1*ih};
-      triMap(s00,s10,s11,p00,p10,p11);
-      triMap(s00,s11,s01,p00,p11,p01);
-    }
+  for(let i=0;i<MESH;i++)for(let j=0;j<MESH;j++){
+    const u0=i/MESH,u1=(i+1)/MESH,v0=j/MESH,v1=(j+1)/MESH;
+    const p00=qp(u0,v0),p10=qp(u1,v0),p11=qp(u1,v1),p01=qp(u0,v1);
+    const s00={x:u0*iw,y:v0*ih},s10={x:u1*iw,y:v0*ih},s11={x:u1*iw,y:v1*ih},s01={x:u0*iw,y:v1*ih};
+    triMap(s00,s10,s11,p00,p10,p11);
+    triMap(s00,s11,s01,p00,p11,p01);
   }
 }
 
@@ -366,8 +209,7 @@ function triMap(s0,s1,s2,d0,d1,d2){
   const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y);
   if(Math.abs(det)<0.5)return;
   ctx.save();
-  ctx.beginPath();ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);
-  ctx.closePath();ctx.clip();
+  ctx.beginPath();ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);ctx.closePath();ctx.clip();
   const id=1/det;
   const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))*id;
   const b=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))*id;
@@ -376,21 +218,15 @@ function triMap(s0,s1,s2,d0,d1,d2){
   const e=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))*id;
   const f=d0.y-d*s0.x-e*s0.y;
   ctx.transform(a,d,b,e,c,f);
-  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=18;ctx.shadowOffsetX=5;ctx.shadowOffsetY=7;
   ctx.drawImage(img,0,0);
   ctx.restore();
 }
 
-/* ══════════════════════════════════
-   DRAW OUTLINE + XYZ AXES
-══════════════════════════════════ */
-function drawOverlay(pts,isLocked){
-  // Outline
+function drawHandles(pts){
   ctx.save();
-  ctx.strokeStyle=isLocked?'rgba(80,255,160,.55)':'rgba(180,140,255,.65)';
-  ctx.lineWidth=2;ctx.setLineDash(isLocked?[6,4]:[4,3]);
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
+  ctx.strokeStyle='rgba(180,140,255,.9)';
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
   [1,2,3,0].forEach(i=>ctx.lineTo(pts[i].x,pts[i].y));
   ctx.stroke();ctx.restore();
 
@@ -457,104 +293,30 @@ function setUI(mode){
     b.textContent='🔒 3D Tracking Aktif';b.className='locked';
     lb.textContent='🔓 Edit';lb.className='locked';
   }
-}
-
-/* ══════════════════════════════════
-   MAIN LOOP
-══════════════════════════════════ */
-function loop(){
-  ctx.clearRect(0,0,W,H);
-
-  let DR, px,py,pz,rx,ry,rz,sz;
-
-  if(locked){
-    // In locked mode: current gyro gives fresh DR
-    // But the object position was defined relative to gyro at lock time
-    // We store a "delta" rotation: from lock-time gyro to current gyro
-    // and apply it to the locked world position
-    DR=devR(oA,oB,oG);
-
-    // Compute object position in world space at lock time
-    const lockDR=devR(lOA,lOB,lOG);
-    // Object in camera-frame at lock:
-    const op=[lPX*0.01,-lPY*0.01,-lPZ*0.01];
-    // World position = lockDR * op
-    const worldPt=mv(lockDR,op);
-
-    // Now project that world point through current DR to camera frame
-    const curRt=mt(DR);
-    const camPt=mv(curRt,worldPt);
-    // Convert back to our position params for buildQuad
-    // buildQuad takes px,py,pz in slider units → op=[px*0.01,-py*0.01,-pz*0.01]
-    // So we need op = camPt, then px=camPt[0]*100, py=-camPt[1]*100, pz=-camPt[2]*100
-    px=camPt[0]*100; py=-camPt[1]*100; pz=-camPt[2]*100;
-
-    // Rotation: we need to also rotate the object orientation by the delta
-    // lockDR rotates from cam→world at lock; curRt rotates world→current cam
-    // Combined: curRt * lockDR = delta rotation matrix
-    const deltaR=mm(curRt,lockDR);
-    // Combine delta with locked object rotation
-    const objOM=mm(mm(makeRz(lRZ),makeRy(lRY)),makeRx(lRX));
-    const finalOM=mm(deltaR,objOM);
-    // Extract euler-ish but we'll just use finalOM directly in a custom drawWarp
-    rx=lRX;ry=lRY;rz=lRZ;sz=lSZ;
-
-    // Build quad using finalOM instead of euler
-    const pts=buildQuadFromOM(finalOM,camPt,sz);
-    if(pts){
-      drawWarp(pts);
-      drawOverlay(pts,true);
-    } else {
-      behindMsg();
-    }
-  } else {
-    DR=devR(oA,oB,oG);
-    px=PX;py=PY;pz=PZ;rx=RX;ry=RY;rz=RZ;sz=SZ;
-    const pts=buildQuad(DR,px,py,pz,rx,ry,rz,sz);
-    if(pts){drawWarp(pts);drawOverlay(pts,false);}
-    else behindMsg();
-  }
-
-  animId=requestAnimationFrame(loop);
-}
-
-// Build quad from already-computed object rotation matrix + camera-frame position
-function buildQuadFromOM(OM,camPt,sz){
-  const h=sz*0.005;
-  const lc=[[-h,-h,0],[h,-h,0],[h,h,0],[-h,h,0]];
-  const identity=[1,0,0,0,1,0,0,0,1];
-  const fakeD=identity; // already in camera frame, pass through
-  const pts=[];
-  for(const c of lc){
-    const rc=mv(OM,c);
-    const wp=[rc[0]+camPt[0],rc[1]+camPt[1],rc[2]+camPt[2]];
-    const sp=w2s(wp[0],wp[1],wp[2],fakeD);
-    if(!sp)return null;
-    pts.push(sp);
-  }
-  return pts;
-}
-
-function behindMsg(){
-  ctx.save();
-  ctx.fillStyle='rgba(255,200,60,.85)';
-  ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('↩ Foto di belakang — geser slider Z atau putar HP',W/2,H*0.5);
   ctx.restore();
 }
 
-/* ══════════════════════════════════
-   BUTTONS
-══════════════════════════════════ */
-function resetAll(){
-  unlock();imgFlip=false;alphaOff=null;
-  PX=0;PY=0;PZ=80;RX=0;RY=0;RZ=0;SZ=120;
-  setSlider('px',0);setSlider('py',0);setSlider('pz',80);
-  setSlider('rrx',0);setSlider('rry',0);setSlider('rrz',0);
-  setSlider('sz',120);
-  onSlider();
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  if(corners.length===4){
+    drawWarp(corners);
+    drawHandles(corners);
+  }
+  animId=requestAnimationFrame(loop);
 }
+
+function resize(){
+  const oldW=W||window.innerWidth, oldH=H||window.innerHeight;
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  if(corners.length===4){
+    const sx=W/oldW, sy=H/oldH;
+    corners.forEach(p=>{p.x*=sx;p.y*=sy;clampPoint(p)});
+  }
+}
+
 function doFlip(){imgFlip=!imgFlip}
+
 async function saveSnap(){
   const sc=document.createElement('canvas');sc.width=W;sc.height=H;
   const sx=sc.getContext('2d');
@@ -617,47 +379,38 @@ async function startAR(){
     camStream=await navigator.mediaDevices.getUserMedia({
       video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
   }catch(e){alert('Kamera gagal:\n'+e.message);return}
+
   const vid=document.getElementById('vid');
   vid.srcObject=camStream;await vid.play();
   document.getElementById('splash').style.display='none';
   document.getElementById('ar').style.display='block';
   canvas=document.getElementById('cv');ctx=canvas.getContext('2d');
   resize();
+  resetCorners();
+  bindDrag();
   window.addEventListener('resize',resize);
-  screen.orientation&&screen.orientation.addEventListener('change',()=>setTimeout(resize,300));
-  onSlider();setupOri();
   animId=requestAnimationFrame(loop);
 }
 
 function stopAR(){
   cancelAnimationFrame(animId);animId=null;
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
-  window.removeEventListener('deviceorientation',onOri,true);
   window.removeEventListener('resize',resize);
   document.getElementById('ar').style.display='none';
   document.getElementById('splash').style.display='flex';
-  locked=null;hasOri=false;alphaOff=null;imgFlip=false;
-  setUI('edit');
+  dragIndex=-1;
 }
 
-/* ══════════════════════════════════
-   DEFAULT IMAGE
-══════════════════════════════════ */
 function buildDefaultImg(){
-  const c=document.createElement('canvas');c.width=600;c.height=600;
+  const c=document.createElement('canvas');c.width=1200;c.height=1200;
   const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,600,600);
-  g.addColorStop(0,'#2211bb');g.addColorStop(.5,'#9922dd');g.addColorStop(1,'#ff4422');
-  x.fillStyle=g;x.fillRect(0,0,600,600);
-  x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=1;
-  for(let i=0;i<600;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,600);x.stroke();
-    x.beginPath();x.moveTo(0,i);x.lineTo(600,i);x.stroke()}
-  x.strokeStyle='rgba(255,255,255,.3)';x.lineWidth=5;x.strokeRect(15,15,570,570);
-  x.fillStyle='rgba(255,255,255,.88)';x.font='bold 60px Arial';x.textAlign='center';
-  x.fillText('AR IMAGE',300,275);
-  x.font='20px Arial';x.fillStyle='rgba(255,255,255,.5)';
-  x.fillText('Pilih foto dari splash',300,335);
-  return c.toDataURL();
+  const g=x.createLinearGradient(0,0,1200,1200);
+  g.addColorStop(0,'#4a1fb8');g.addColorStop(1,'#b53fd5');
+  x.fillStyle=g;x.fillRect(0,0,1200,1200);
+  x.fillStyle='rgba(255,255,255,.9)';
+  x.font='bold 92px Arial';x.textAlign='center';
+  x.fillText('PILIH FOTO',600,620);
+  return c.toDataURL('image/jpeg',1);
 }
 </script>
 </body>
