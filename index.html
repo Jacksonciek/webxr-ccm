@@ -389,8 +389,6 @@ function drawOverlay(pts,isLocked){
   // Axes from center
   const cx=(pts[0].x+pts[1].x+pts[2].x+pts[3].x)/4;
   const cy=(pts[0].y+pts[1].y+pts[2].y+pts[3].y)/4;
-  const xd={(pts[1].x-pts[0].x+pts[2].x-pts[3].x)/2:(pts[1].y-pts[0].y+pts[2].y-pts[3].y)/2};
-  // rebuild properly
   const xvx=(pts[1].x-pts[0].x+pts[2].x-pts[3].x)/2;
   const xvy=(pts[1].y-pts[0].y+pts[2].y-pts[3].y)/2;
   const yvx=(pts[3].x-pts[0].x+pts[2].x-pts[1].x)/2;
