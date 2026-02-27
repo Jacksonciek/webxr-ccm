@@ -1,24 +1,30 @@
 # AR Wall 3D
 
-Web app ringan untuk menempelkan foto persegi di tampilan kamera dengan metode **4 titik sudut**.
+Web app sederhana untuk menempelkan foto ke dinding secara AR-style lewat kamera HP.
 
 ## Fitur
 - Upload foto dari splash screen.
-- Mulai AR lalu atur foto dengan **drag 4 titik sudut** (TL, TR, BR, BL).
-- Tanpa slider position/rotation: pengaturan perspektif langsung dari sudut.
-- Flip horizontal, reset titik, simpan snapshot.
+- Tombol **Mulai AR** untuk masuk ke mode kamera.
+- Kontrol posisi (`X/Y/Z`), rotasi (`X/Y/Z`), dan ukuran.
+- Lock tracking, flip foto, reset, dan simpan snapshot.
+- Kompatibel untuk Safari iOS dan Chrome Android.
 
-## Menjalankan project
+## Cara menjalankan
+Karena ini single-file app, cukup jalankan static server dari root project:
+
 ```bash
 python3 -m http.server 4173
 ```
-Buka `http://localhost:4173`.
 
-## Cara pakai
-1. Pilih foto (disarankan rasio 1:1/persegi).
-2. Tekan **Mulai AR**.
-3. Geser 4 titik sudut di kanvas agar pas ke bidang dinding.
-4. Tekan **Simpan** untuk ekspor hasil gabungan kamera + overlay.
+Lalu buka:
 
-## Struktur
-- `index.html`: UI + logika kamera + warp 4 sudut.
+- `http://localhost:4173`
+
+> Untuk HP, akses lewat IP LAN mesin yang menjalankan server.
+
+## Catatan penggunaan
+- Saat tidak ada data gyroscope (atau izin belum diberikan), objek sekarang tetap dibuat dengan orientasi default supaya gambar langsung terlihat setelah tekan **Mulai AR**.
+- Di iOS, jika diminta, izinkan sensor gerak agar tracking lebih natural.
+
+## Struktur project
+- `index.html`: UI, styling, dan seluruh logika AR/canvas.

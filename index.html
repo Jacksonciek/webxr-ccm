@@ -80,6 +80,26 @@ let dragIndex = -1;
 let dragBound = false;
 const MESH = 16;
 
+// Current slider values
+let PX=0, PY=0, PZ=80;
+let RX=0, RY=0, RZ=0;
+let SZ=120;
+
+// Gyro
+let oA=0, oB=0, oG=0;
+let alphaOff=null, hasOri=false;
+
+// Locked state: true = locked, null = edit
+let locked = null;
+let lPX,lPY,lPZ,lRX,lRY,lRZ,lSZ;
+let lOA,lOB,lOG; // gyro at lock time
+
+const HFOV = 65 * Math.PI/180;
+const MESH = 12;
+
+/* ══════════════════════════════════
+   FILE
+══════════════════════════════════ */
 function onFile(e){
   const f=e.target.files[0]; if(!f)return;
   const url=URL.createObjectURL(f);
@@ -97,6 +117,22 @@ function ensureImageReady(){
     img.addEventListener('error',done,{once:true});
   });
 }
+function v(id){return document.getElementById(id).value}
+function sv(id,val){document.getElementById(id).textContent=val}
+function setSlider(id,val){document.getElementById(id).value=val}
+function ensureImageReady(){
+  return new Promise(resolve=>{
+    if(img.complete&&img.naturalWidth)return resolve();
+    const done=()=>resolve();
+    img.addEventListener('load',done,{once:true});
+    img.addEventListener('error',done,{once:true});
+  });
+}
+
+/* ══════════════════════════════════
+   MATH
+══════════════════════════════════ */
+function rot3(deg){return deg*Math.PI/180}
 
 function resetCorners(){
   const s=Math.min(W,H)*0.56;
@@ -192,13 +228,70 @@ function drawHandles(pts){
   ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
   [1,2,3,0].forEach(i=>ctx.lineTo(pts[i].x,pts[i].y));
-  ctx.stroke();
-  for(let i=0;i<4;i++){
-    const p=pts[i];
-    ctx.fillStyle='rgba(255,255,255,.95)';
-    ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,.45)';
-    ctx.lineWidth=2;ctx.stroke();
+  ctx.stroke();ctx.restore();
+
+  // Axes from center
+  const cx=(pts[0].x+pts[1].x+pts[2].x+pts[3].x)/4;
+  const cy=(pts[0].y+pts[1].y+pts[2].y+pts[3].y)/4;
+  const xvx=(pts[1].x-pts[0].x+pts[2].x-pts[3].x)/2;
+  const xvy=(pts[1].y-pts[0].y+pts[2].y-pts[3].y)/2;
+  const yvx=(pts[3].x-pts[0].x+pts[2].x-pts[1].x)/2;
+  const yvy=(pts[3].y-pts[0].y+pts[2].y-pts[1].y)/2;
+  const xl=Math.hypot(xvx,xvy)||1, yl=Math.hypot(yvx,yvy)||1;
+  const S=44;
+  arrow(cx,cy, xvx/xl*S,xvy/xl*S, '#ff5555','X');
+  arrow(cx,cy, yvx/yl*S,yvy/yl*S, '#55ff88','Y');
+  // Z = approx inward
+  arrow(cx,cy, -(xvx/xl+yvx/yl)*S*0.5, -(xvy/xl+yvy/yl)*S*0.5, '#5599ff','Z');
+}
+
+function arrow(ox,oy,dx,dy,col,lbl){
+  const len=Math.hypot(dx,dy); if(len<3)return;
+  const ang=Math.atan2(dy,dx);
+  ctx.save();
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2.5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+dx,oy+dy);ctx.stroke();
+  const al=10,aw=0.42;
+  ctx.beginPath();
+  ctx.moveTo(ox+dx,oy+dy);
+  ctx.lineTo(ox+dx-al*Math.cos(ang-aw),oy+dy-al*Math.sin(ang-aw));
+  ctx.lineTo(ox+dx-al*Math.cos(ang+aw),oy+dy-al*Math.sin(ang+aw));
+  ctx.closePath();ctx.fill();
+  const lx=ox+dx+14*Math.cos(ang),ly=oy+dy+14*Math.sin(ang);
+  ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(lx-8,ly-8,16,16);
+  ctx.fillStyle=col;ctx.fillText(lbl,lx,ly);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════
+   LOCK / UNLOCK
+══════════════════════════════════ */
+function toggleLock(){locked?unlock():lock()}
+
+function lock(){
+  locked=true;
+  // Capture current values
+  lPX=PX;lPY=PY;lPZ=PZ;lRX=RX;lRY=RY;lRZ=RZ;lSZ=SZ;
+  // Capture gyro delta reference
+  lOA=oA;lOB=oB;lOG=oG;
+  setUI('locked');
+}
+
+function unlock(){
+  locked=null;
+  setUI('edit');
+}
+
+function setUI(mode){
+  const b=document.getElementById('badge');
+  const lb=document.getElementById('lockBtn');
+  if(mode==='edit'){
+    b.textContent='✏️ Mode Edit';b.className='edit';
+    lb.textContent='📌 Kunci';lb.className='edit';
+  } else {
+    b.textContent='🔒 3D Tracking Aktif';b.className='locked';
+    lb.textContent='🔓 Edit';lb.className='locked';
   }
   ctx.restore();
 }
@@ -230,7 +323,53 @@ async function saveSnap(){
   sx.drawImage(document.getElementById('vid'),0,0,W,H);
   sx.drawImage(canvas,0,0);
   const a=document.createElement('a');a.download='ar-wall-3d.jpg';
-  a.href=sc.toDataURL('image/jpeg',.96);a.click();
+  a.href=sc.toDataURL('image/jpeg',.93);a.click();
+}
+
+/* ══════════════════════════════════
+   GYRO
+══════════════════════════════════ */
+function onOri(e){
+  if(e.beta===null)return;
+  const rawA=e.alpha||0;
+  if(alphaOff===null)alphaOff=rawA;
+  oA=((rawA-alphaOff)+360)%360*Math.PI/180;
+  oB=e.beta*Math.PI/180;
+  oG=e.gamma*Math.PI/180;
+  hasOri=true;
+}
+
+function setupOri(){
+  if(typeof DeviceOrientationEvent!=='undefined'&&
+     typeof DeviceOrientationEvent.requestPermission==='function'){
+    document.getElementById('permOvl').style.display='flex';
+  } else {
+    window.addEventListener('deviceorientation',onOri,true);
+    if(!('ontouchstart' in window)){
+      hasOri=true;
+      document.addEventListener('mousemove',e=>{
+        oA=((e.clientX/W)-0.5)*1.8;
+        oB=((e.clientY/H)-0.5)*1.1;
+        oG=0;
+      });
+    }
+  }
+}
+
+async function reqPerm(){
+  document.getElementById('permOvl').style.display='none';
+  try{
+    const r=await DeviceOrientationEvent.requestPermission();
+    if(r==='granted')window.addEventListener('deviceorientation',onOri,true);
+  }catch{window.addEventListener('deviceorientation',onOri,true)}
+}
+
+/* ══════════════════════════════════
+   RESIZE / START / STOP
+══════════════════════════════════ */
+function resize(){
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
 }
 
 async function startAR(){
