@@ -1,151 +1,217 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" oncontextmenu="return false">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
 <title>AR Wall 3D</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-body{background:#06060f;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;width:100vw;height:100dvh}
+/* Block ALL long-press popups everywhere */
+*{
+  margin:0;padding:0;box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+}
+canvas,video,img{
+  pointer-events:none;
+  -webkit-user-drag:none;
+  -khtml-user-drag:none;
+  user-drag:none;
+}
+canvas{ pointer-events:all !important; touch-action:none !important; }
 
-/* ────── SPLASH ────── */
+body{
+  background:#07070f;
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  color:#fff;overflow:hidden;
+  width:100vw;height:100dvh;
+}
+
+/* ── SPLASH ── */
 #splash{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  height:100dvh;padding:28px;gap:18px;
-  background:radial-gradient(ellipse 80% 50% at 50% 0%,#180a40,#06060f 70%)}
-.slogo{font-size:52px;filter:drop-shadow(0 0 26px #9955ffaa)}
-h1{font-size:25px;font-weight:900;letter-spacing:-0.8px;text-align:center;
-  background:linear-gradient(130deg,#bb88ff 20%,#ff66cc 80%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.ssub{font-size:13px;color:#666;text-align:center;line-height:1.65;max-width:300px}
-.card{background:#0e0e1c;border:1px solid #1e1e38;border-radius:20px;padding:16px;width:100%;max-width:350px}
+  min-height:100dvh;padding:28px;gap:16px;
+  background:radial-gradient(ellipse 90% 55% at 50% -5%,#1d0b45,#07070f 65%);
+}
+.slogo{font-size:50px;filter:drop-shadow(0 0 24px #9944ffbb)}
+h1{
+  font-size:24px;font-weight:900;letter-spacing:-0.6px;text-align:center;
+  background:linear-gradient(130deg,#bf88ff 20%,#ff66cc 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.ssub{font-size:13px;color:#666;text-align:center;line-height:1.65;max-width:290px}
+.card{
+  background:#0f0f1d;border:1px solid #1f1f3a;border-radius:20px;
+  padding:16px;width:100%;max-width:340px;
+}
 .clbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
-.pbox{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;
-  background:#0a0a18;border:2px dashed #1e1e38;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s}
-.pbox:active{border-color:#9955ff}
-.pbox img{width:100%;height:100%;object-fit:cover;display:none}
+.pbox{
+  width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;
+  background:#0a0a18;border:2px dashed #1f1f3a;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:border-color .2s;
+}
+.pbox:active{border-color:#9944ff}
+.pbox img{width:100%;height:100%;object-fit:cover;display:none;pointer-events:none}
 .ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:#333;font-size:11px}
-.ph .ei{font-size:28px}
+.phico{font-size:30px}
 input[type=file]{display:none}
-.sbtn{background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
+.sbtn{
+  background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
   border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;
-  width:100%;max-width:350px;box-shadow:0 6px 28px #6622ee44;transition:transform .1s,opacity .2s}
+  width:100%;max-width:340px;box-shadow:0 6px 28px #6622ee44;
+  transition:transform .12s,opacity .2s;
+}
 .sbtn:active{transform:scale(.97);opacity:.88}
 .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.tag{background:#0e0e1c;border:1px solid #1e1e38;border-radius:50px;padding:5px 12px;font-size:11px;color:#666}
+.tag{
+  background:#0f0f1d;border:1px solid #1f1f3a;border-radius:50px;
+  padding:5px 12px;font-size:11px;color:#666
+}
 .tag b{color:#99aaff;font-weight:600}
 
-/* ────── AR SCREEN ────── */
+/* ── AR SCREEN ── */
 #ar{display:none;position:fixed;inset:0;z-index:100}
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-#cv{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+#cv{
+  position:absolute;inset:0;width:100%;height:100%;z-index:2;
+  touch-action:none;
+}
 
-/* Topbar */
-#topbar{position:absolute;top:0;left:0;right:0;z-index:10;
-  padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
-.tbtitle{font-size:14px;font-weight:700}
-.tbclose{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+/* Top bar */
+#topbar{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  padding:safe-area-inset-top 20px 12px;
+  padding-top:max(env(safe-area-inset-top,0px),18px);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,.72),transparent);
+  pointer-events:none;
+}
+.tbtitle{font-size:14px;font-weight:700;opacity:.9}
+.tbclose{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.14);color:#fff;
-  border-radius:50px;padding:7px 16px;font-size:12px;cursor:pointer;pointer-events:all}
+  border-radius:50px;padding:7px 16px;font-size:12px;cursor:pointer;
+  pointer-events:all;
+}
 
-/* Status badge */
-#badge{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:10;
+/* Mode badge */
+#badge{
+  position:absolute;top:68px;left:50%;transform:translateX(-50%);z-index:10;
   padding:7px 18px;border-radius:50px;font-size:12px;font-weight:700;
-  backdrop-filter:blur(12px);white-space:nowrap;pointer-events:none;transition:all .3s}
-#badge.edit{background:rgba(255,170,0,.18);border:1px solid rgba(255,200,0,.35);color:#ffd060}
-#badge.locked{background:rgba(0,200,100,.18);border:1px solid rgba(0,220,110,.35);color:#44ffaa}
+  backdrop-filter:blur(12px);border:1px solid;white-space:nowrap;pointer-events:none;
+  transition:background .3s,color .3s;
+}
+#badge.edit{background:rgba(255,175,0,.18);border-color:rgba(255,200,0,.38);color:#ffd060}
+#badge.locked{background:rgba(0,210,100,.18);border-color:rgba(0,230,110,.38);color:#44ffaa}
 
-/* ────── BOTTOM PANEL ────── */
-#panel{position:absolute;bottom:0;left:0;right:0;z-index:10;
-  padding:10px 12px 30px;
-  background:linear-gradient(to top,rgba(0,0,0,.88) 70%,transparent);
-  display:flex;flex-direction:column;gap:7px}
+/* Hint toast */
+#hint{
+  position:absolute;top:112px;left:50%;transform:translateX(-50%);z-index:10;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);border-radius:50px;
+  padding:6px 16px;font-size:11px;color:#bbb;
+  white-space:nowrap;pointer-events:none;
+  transition:opacity .5s;
+}
 
-.sec{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1.5px;
-  display:flex;align-items:center;gap:8px;padding:2px 2px 0}
-.sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
+/* Bottom panel */
+#panel{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  padding:14px 14px max(env(safe-area-inset-bottom,0px),28px);
+  background:linear-gradient(to top,rgba(0,0,0,.85) 65%,transparent);
+  display:flex;flex-direction:column;gap:9px;align-items:center;
+}
+.btnrow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.abtn{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;
+  border-radius:50px;padding:11px 16px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:background .15s;white-space:nowrap;
+}
+.abtn:active{background:rgba(255,255,255,.24)}
+.abtn.green{background:rgba(20,180,80,.35);border-color:rgba(40,210,100,.4)}
+.abtn.red{background:rgba(180,20,20,.35);border-color:rgba(220,50,50,.35)}
+.abtn.blue{background:rgba(40,80,220,.35);border-color:rgba(70,110,240,.4)}
 
-.srow{display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
-  border-radius:10px;padding:7px 10px}
-.axis{font-size:12px;font-weight:900;min-width:20px;text-align:center;letter-spacing:.5px}
-.axis.x{color:#ff5555}.axis.y{color:#55ff88}.axis.z{color:#5599ff}.axis.s{color:#ffaa44}
-.val{font-size:11px;min-width:40px;text-align:right;font-variant-numeric:tabular-nums;color:#666}
-
-input[type=range]{flex:1;-webkit-appearance:none;appearance:none;
-  height:4px;border-radius:99px;outline:none;cursor:pointer}
+/* FOV calibration strip */
+.fovrow{
+  display:flex;align-items:center;gap:9px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:50px;padding:7px 16px;width:100%;max-width:330px;
+}
+.fovrow label{font-size:10px;color:#666;white-space:nowrap}
+input[type=range]{
+  flex:1;-webkit-appearance:none;appearance:none;
+  height:3px;background:rgba(255,255,255,.18);border-radius:99px;outline:none;
+}
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
-  border:2.5px solid rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer}
-.rx{background:linear-gradient(to right,#ff555533,#ff5555)}
-.ry{background:linear-gradient(to right,#55ff8833,#55ff88)}
-.rz{background:linear-gradient(to right,#5599ff33,#5599ff)}
-.rs{background:linear-gradient(to right,#ffaa4433,#ffaa44)}
-.rx::-webkit-slider-thumb{background:#ff5555}
-.ry::-webkit-slider-thumb{background:#55ff88}
-.rz::-webkit-slider-thumb{background:#5599ff}
-.rs::-webkit-slider-thumb{background:#ffaa44}
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,#7733ff,#dd55ff);
+  box-shadow:0 0 8px #7733ff55;cursor:pointer;
+}
 
-/* Buttons */
-.btnrow{display:flex;gap:7px;align-items:center;justify-content:center;padding-top:2px}
-.abtn{background:rgba(255,255,255,.09);backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.12);color:#fff;
-  border-radius:50px;padding:10px 13px;font-size:12px;font-weight:600;
-  cursor:pointer;transition:background .15s;white-space:nowrap;flex:1;text-align:center}
-.abtn:active{background:rgba(255,255,255,.2)}
-.abtn.red{background:rgba(180,20,20,.3);border-color:rgba(220,50,50,.3)}
-#lockBtn{flex:1.5;border-radius:50px;border:none;cursor:pointer;
-  font-size:12px;font-weight:800;padding:11px 10px;
-  transition:transform .1s,box-shadow .2s;color:#fff}
-#lockBtn.edit{background:linear-gradient(135deg,#5533ff,#cc44ee);box-shadow:0 0 18px #7722ff44}
-#lockBtn.locked{background:linear-gradient(135deg,#116611,#44cc44);box-shadow:0 0 18px #22ff6633}
-#lockBtn:active{transform:scale(.92)}
-
-/* iOS permission */
-#permOvl{display:none;position:fixed;inset:0;z-index:200;
+/* iOS permission overlay */
+#permOvl{
+  display:none;position:fixed;inset:0;z-index:200;
   background:rgba(0,0,0,.88);backdrop-filter:blur(20px);
-  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px}
-.picn{font-size:50px}.ptitle{font-size:19px;font-weight:800;text-align:center}
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px;
+}
+.picn{font-size:50px}
+.ptitle{font-size:19px;font-weight:800;text-align:center}
 .psub{font-size:13px;color:#888;text-align:center;line-height:1.65;max-width:280px}
-.pbtn{background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
-  border-radius:14px;padding:14px 30px;font-size:15px;font-weight:700;cursor:pointer}
+.pbtn{
+  background:linear-gradient(135deg,#4422ee,#aa44dd);border:none;color:#fff;
+  border-radius:14px;padding:14px 30px;font-size:15px;font-weight:700;cursor:pointer;
+}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ══════════ SPLASH ══════════ -->
 <div id="splash">
   <div class="slogo">🖼️</div>
   <h1>AR Wall 3D</h1>
-  <p class="ssub">Atur posisi & rotasi foto ke dinding lewat slider X Y Z, lalu kunci — foto stay saat HP digerakkan.</p>
+  <p class="ssub">Drag 4 sudut ke pojok foto di dinding, kunci, lalu gerakkan HP — foto tetap stay di tempat.</p>
+
   <div class="card">
-    <div class="clbl">Pilih Foto (Persegi)</div>
+    <div class="clbl">Pilih Foto</div>
     <div class="pbox" onclick="document.getElementById('fi').click()">
-      <div class="ph" id="ph"><span class="ei">📂</span>Ketuk untuk pilih foto</div>
-      <img id="prevImg"/>
+      <div class="ph" id="ph">
+        <span class="phico">📂</span>
+        Ketuk untuk pilih foto
+      </div>
+      <img id="prevImg" draggable="false"/>
     </div>
     <input type="file" id="fi" accept="image/*" onchange="onFile(event)"/>
   </div>
-  <button class="sbtn" onclick="startAR()">📷 Mulai AR</button>
+
+  <button class="sbtn" onclick="startAR()">📷 Mulai AR 3D</button>
+
   <div class="tags">
     <div class="tag"><b>✓</b> iOS Safari</div>
     <div class="tag"><b>✓</b> Android Chrome</div>
-    <div class="tag"><b>✓</b> Position XYZ</div>
-    <div class="tag"><b>✓</b> Rotation XYZ</div>
+    <div class="tag"><b>✓</b> 4-Corner Warp</div>
+    <div class="tag"><b>✓</b> XYZ Gyro Lock</div>
   </div>
 </div>
 
-<!-- IOS PERMISSION -->
+<!-- ══════════ iOS PERMISSION ══════════ -->
 <div id="permOvl">
   <div class="picn">🔄</div>
   <div class="ptitle">Izin Sensor Gerak</div>
-  <div class="psub">iOS perlu izin gyroscope agar foto bisa stay di dinding saat HP digerakkan.</div>
+  <div class="psub">iOS butuh izin gyroscope agar foto bisa stay di dinding saat HP digerakkan.</div>
   <button class="pbtn" onclick="reqPerm()">Izinkan Sensor</button>
 </div>
 
-<!-- AR -->
+<!-- ══════════ AR SCREEN ══════════ -->
 <div id="ar">
   <video id="vid" autoplay playsinline muted></video>
   <canvas id="cv"></canvas>
@@ -154,58 +220,19 @@ input[type=range]::-webkit-slider-thumb{
     <div class="tbtitle">🖼️ AR Wall 3D</div>
     <div class="tbclose" onclick="stopAR()">✕ Keluar</div>
   </div>
-  <div id="badge" class="edit">✏️ Mode Edit</div>
+
+  <div id="badge" class="edit">✏️ Edit — Drag 4 Sudut</div>
+  <div id="hint">Drag sudut berwarna · Drag tengah untuk geser semua</div>
 
   <div id="panel">
-    <!-- POSITION -->
-    <div class="sec">📍 Posisi</div>
-    <div class="srow">
-      <div class="axis x">X</div>
-      <input type="range" class="rx" id="px" min="-100" max="100" value="0" oninput="onSlider()"/>
-      <div class="val" id="vpx">0</div>
+    <div class="fovrow">
+      <label>📐 Kalibrasi FOV</label>
+      <input type="range" id="fovR" min="40" max="100" value="65" oninput="HFOV=+this.value*DEG"/>
     </div>
-    <div class="srow">
-      <div class="axis y">Y</div>
-      <input type="range" class="ry" id="py" min="-100" max="100" value="0" oninput="onSlider()"/>
-      <div class="val" id="vpy">0</div>
-    </div>
-    <div class="srow">
-      <div class="axis z">Z</div>
-      <input type="range" class="rz" id="pz" min="10" max="300" value="80" oninput="onSlider()"/>
-      <div class="val" id="vpz">80</div>
-    </div>
-
-    <!-- ROTATION -->
-    <div class="sec">🔄 Rotasi</div>
-    <div class="srow">
-      <div class="axis x">X</div>
-      <input type="range" class="rx" id="rrx" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vrx">0°</div>
-    </div>
-    <div class="srow">
-      <div class="axis y">Y</div>
-      <input type="range" class="ry" id="rry" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vry">0°</div>
-    </div>
-    <div class="srow">
-      <div class="axis z">Z</div>
-      <input type="range" class="rz" id="rrz" min="-180" max="180" value="0" oninput="onSlider()"/>
-      <div class="val" id="vrz">0°</div>
-    </div>
-
-    <!-- SIZE -->
-    <div class="sec">📐 Ukuran</div>
-    <div class="srow">
-      <div class="axis s">S</div>
-      <input type="range" class="rs" id="sz" min="10" max="400" value="120" oninput="onSlider()"/>
-      <div class="val" id="vsz">120</div>
-    </div>
-
-    <!-- BUTTONS -->
     <div class="btnrow">
-      <div class="abtn" onclick="resetAll()">↺ Reset</div>
+      <div class="abtn blue" onclick="resetCorners()">↺ Reset</div>
       <div class="abtn" onclick="doFlip()">⇄ Flip</div>
-      <button id="lockBtn" class="edit" onclick="toggleLock()">📌 Kunci</button>
+      <div id="lockBtn" class="abtn green" onclick="toggleLock()">📌 Kunci 3D</div>
       <div class="abtn" onclick="saveSnap()">💾 Simpan</div>
       <div class="abtn red" onclick="stopAR()">✕</div>
     </div>
@@ -213,153 +240,207 @@ input[type=range]::-webkit-slider-thumb{
 </div>
 
 <script>
-/* ══════════════════════════════════
+'use strict';
+/* ─────────────────────────────────────────────
+   GLOBAL BLOCK: prevent ANY long-press popup
+───────────────────────────────────────────── */
+document.addEventListener('contextmenu', e=>e.preventDefault(), true);
+document.addEventListener('touchstart',  e=>{ /* handled per-canvas */ }, {passive:false});
+window.addEventListener('selectstart', e=>e.preventDefault(), true);
+
+/* ─────────────────────────────────────────────
+   CONSTANTS
+───────────────────────────────────────────── */
+const DEG  = Math.PI/180;
+const MESH = 16;        // perspective warp mesh density
+const HIT_R = 34;       // finger hit radius for corner handles (px)
+const COLORS = ['#ff4444','#4488ff','#44ff88','#ffcc00']; // TL TR BR BL
+const LABELS = ['TL','TR','BR','BL'];
+
+/* ─────────────────────────────────────────────
    STATE
-══════════════════════════════════ */
+───────────────────────────────────────────── */
+let HFOV = 65*DEG;       // horizontal field of view (adjustable)
+
+let camStream  = null;
+let animId     = null;
 let canvas, ctx, W, H;
-let camStream = null, animId = null;
-const img = new Image();
-let imgFlip = false;
 
-// Current slider values
-let PX=0, PY=0, PZ=80;
-let RX=0, RY=0, RZ=0;
-let SZ=120;
+const img      = new Image();
+img.crossOrigin = 'anonymous';
+let imgFlip    = false;
 
-// Gyro
-let oA=0, oB=Math.PI*0.5, oG=0;
-let alphaOff=null, hasOri=false;
+// Edit-mode corners: [{x,y}, ...] order: TL TR BR BL
+let corners    = [];
 
-// Locked state: true = locked, null = edit
-let locked = null;
-let lPX,lPY,lPZ,lRX,lRY,lRZ,lSZ;
-let lOA,lOB,lOG; // gyro at lock time
+// Locked-mode: 4 world-space unit direction vectors
+let locked     = null;  // null = edit, array[4] = locked
 
-const HFOV = 65 * Math.PI/180;
-const MESH = 12;
+// Gyro state
+let oA=0, oB=Math.PI/2, oG=0;
+let alphaOff   = null;
+let hasOri     = false;
 
-/* ══════════════════════════════════
-   FILE
-══════════════════════════════════ */
-function onFile(e){
-  const f=e.target.files[0]; if(!f)return;
-  const url=URL.createObjectURL(f);
-  img.src=url;
-  document.getElementById('prevImg').src=url;
-  document.getElementById('prevImg').style.display='block';
-  document.getElementById('ph').style.display='none';
-}
+// Pointer tracking (unified mouse + touch)
+let activeIdx  = -1;   // which corner is being dragged (-1=none, 4=move-all)
+let moveStart  = null; // {x,y} pointer start for move-all
+let cornersSnap= null; // snapshot of corners at move-all start
 
-/* ══════════════════════════════════
-   SLIDERS → sync state & labels
-══════════════════════════════════ */
-function onSlider(){
-  PX=+v('px'); PY=+v('py'); PZ=+v('pz');
-  RX=+v('rrx'); RY=+v('rry'); RZ=+v('rrz');
-  SZ=+v('sz');
-  sv('vpx',PX); sv('vpy',PY); sv('vpz',PZ);
-  sv('vrx',RX+'°'); sv('vry',RY+'°'); sv('vrz',RZ+'°');
-  sv('vsz',SZ);
-}
-function v(id){return document.getElementById(id).value}
-function sv(id,val){document.getElementById(id).textContent=val}
-function setSlider(id,val){document.getElementById(id).value=val}
+/* ─────────────────────────────────────────────
+   MATH HELPERS
+───────────────────────────────────────────── */
+const norm = v=>{const l=Math.hypot(...v);return l<1e-9?[0,0,1]:v.map(x=>x/l)};
+const mv   = (M,v)=>[M[0]*v[0]+M[1]*v[1]+M[2]*v[2], M[3]*v[0]+M[4]*v[1]+M[5]*v[2], M[6]*v[0]+M[7]*v[1]+M[8]*v[2]];
+const mt   = M=>[M[0],M[3],M[6],M[1],M[4],M[7],M[2],M[5],M[8]];
 
-/* ══════════════════════════════════
-   MATH
-══════════════════════════════════ */
-function rot3(deg){return deg*Math.PI/180}
-
-function makeRx(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[1,0,0,0,c,-s,0,s,c]}
-function makeRy(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[c,0,s,0,1,0,-s,0,c]}
-function makeRz(d){const r=rot3(d),c=Math.cos(r),s=Math.sin(r);return[c,-s,0,s,c,0,0,0,1]}
-function mm(A,B){
-  const R=[];
-  for(let i=0;i<3;i++)for(let j=0;j<3;j++)
-    R[i*3+j]=A[i*3]*B[j]+A[i*3+1]*B[3+j]+A[i*3+2]*B[6+j];
-  return R;
-}
-function mv(M,v){return[M[0]*v[0]+M[1]*v[1]+M[2]*v[2],M[3]*v[0]+M[4]*v[1]+M[5]*v[2],M[6]*v[0]+M[7]*v[1]+M[8]*v[2]]}
-function mt(M){return[M[0],M[3],M[6],M[1],M[4],M[7],M[2],M[5],M[8]]}
-
-// Device rotation matrix (W3C spec)
-function devR(a,b,g){
+// W3C DeviceOrientation rotation matrix
+function buildR(a,b,g){
   const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
   return[ca*cg-sa*sb*sg,-sa*cb,ca*sg+sa*sb*cg,
          sa*cg+ca*sb*sg, ca*cb,sa*sg-ca*sb*cg,
-        -cb*sg,          sb,   cb*cg];
+        -cb*sg,           sb,  cb*cg];
 }
 
-function screenAng(){return((((screen.orientation&&screen.orientation.angle)||window.orientation||0)+360)%360)}
+// Screen orientation correction angle
+function screenAng(){
+  return((((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360)+360)%360;
+}
 
-// 3D world point → 2D screen pixel
-function w2s(wx,wy,wz,DR){
-  const Rt=mt(DR);
-  const d=mv(Rt,[wx,wy,wz]);
-  if(d[2]>=-0.01)return null;
+// 2D screen pixel → unit ray in device camera frame (-Z forward)
+function px2ray(sx,sy){
+  const vfov=HFOV*(H/W);
+  let nx=(sx/W*2-1)*Math.tan(HFOV/2);
+  let ny=-(sy/H*2-1)*Math.tan(vfov/2);
+  const sa=screenAng();
+  if(sa===90) {[nx,ny]=[ny,-nx]}
+  else if(sa===270){[nx,ny]=[-ny,nx]}
+  else if(sa===180){nx=-nx;ny=-ny}
+  return norm([nx,ny,-1]);
+}
+
+// Screen pixel → world-space unit direction
+function px2world(sx,sy){
+  const R=buildR(oA,oB,oG);
+  return norm(mv(R,px2ray(sx,sy)));
+}
+
+// World-space direction → screen pixel (returns {x,y} or null if behind)
+function world2px(wd){
+  const R=buildR(oA,oB,oG);
+  const Rt=mt(R);
+  const d=mv(Rt,wd);
+  if(d[2]>=-0.005) return null;  // behind or on camera plane
   const dep=-d[2];
   const vfov=HFOV*(H/W);
   let lx=d[0]/dep, ly=d[1]/dep;
   const sa=screenAng();
-  if(sa===90){const t=lx;lx=-ly;ly=t}
+  if(sa===90) {const t=lx;lx=-ly;ly=t}
   else if(sa===270){const t=lx;lx=ly;ly=-t}
   else if(sa===180){lx=-lx;ly=-ly}
-  return{x:lx/Math.tan(HFOV/2)*(W/2)+W/2, y:-ly/Math.tan(vfov/2)*(H/2)+H/2, dep};
+  return{
+    x: lx/Math.tan(HFOV/2)*(W/2)+W/2,
+    y:-ly/Math.tan(vfov/2)*(H/2)+H/2
+  };
 }
 
-/* ══════════════════════════════════
-   BUILD QUAD
-   Returns 4 screen points [TL,TR,BR,BL] or null
-══════════════════════════════════ */
-function buildQuad(DR, px,py,pz, rx,ry,rz, sz){
-  const h=sz*0.005;            // half-size in world units
-  // Local corners: flat in XY plane, Z=0
-  const lc=[[-h,-h,0],[h,-h,0],[h,h,0],[-h,h,0]];
-  // Object rotation: Rz·Ry·Rx
-  const OM=mm(mm(makeRz(rz),makeRy(ry)),makeRx(rx));
-  // Object position in camera-relative world space
-  // Camera looks in -Z; object placed at (px*0.01, -py*0.01, -pz*0.01)
-  const op=[px*0.01, -py*0.01, -pz*0.01];
-  const pts=[];
-  for(const c of lc){
-    const rc=mv(OM,c);
-    const sp=w2s(rc[0]+op[0],rc[1]+op[1],rc[2]+op[2], DR);
-    if(!sp)return null;
-    pts.push(sp);
+/* ─────────────────────────────────────────────
+   CANVAS RESIZE
+───────────────────────────────────────────── */
+function resize(){
+  W=canvas.width =window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  if(!locked) initCorners(false);
+}
+
+/* ─────────────────────────────────────────────
+   CORNERS
+───────────────────────────────────────────── */
+function initCorners(force=true){
+  if(!force && corners.length===4) return;
+  const pw=W*0.55, ph=pw;  // square default
+  const cx=W/2, cy=H*0.42;
+  corners=[
+    {x:cx-pw/2, y:cy-ph/2},  // TL
+    {x:cx+pw/2, y:cy-ph/2},  // TR
+    {x:cx+pw/2, y:cy+ph/2},  // BR
+    {x:cx-pw/2, y:cy+ph/2},  // BL
+  ];
+}
+
+function resetCorners(){
+  locked=null;
+  imgFlip=false;
+  alphaOff=null;
+  initCorners(true);
+  setEditMode();
+  setHint('Drag sudut berwarna · Drag tengah untuk geser semua');
+}
+
+/* ─────────────────────────────────────────────
+   LOCK / UNLOCK
+───────────────────────────────────────────── */
+function toggleLock(){
+  if(locked) unlockImage();
+  else lockImage();
+}
+
+function lockImage(){
+  // Store world-space direction for each corner
+  locked = corners.map(c=>px2world(c.x,c.y));
+  setLockedMode();
+  setHint('✅ Dikunci! Gerakkan HP — foto tetap stay');
+  setTimeout(()=>setHint(''),3500);
+}
+
+function unlockImage(){
+  // Reconstruct screen corners from current projection
+  if(locked){
+    const proj=locked.map(wd=>world2px(wd));
+    if(proj.every(p=>p!==null)){
+      corners=proj.map(p=>({x:p.x,y:p.y}));
+    }
   }
-  return pts;
+  locked=null;
+  setEditMode();
+  setHint('Edit mode — drag sudut untuk atur ulang');
+  setTimeout(()=>setHint(''),2500);
 }
 
-/* ══════════════════════════════════
-   DRAW WARPED IMAGE (perspective mesh)
-══════════════════════════════════ */
-function drawWarp(pts){
-  if(!img.complete||!img.naturalWidth)return;
+/* ─────────────────────────────────────────────
+   PERSPECTIVE WARP DRAW
+   Uses fine triangle mesh for correct perspective
+───────────────────────────────────────────── */
+function drawWarped(cors){
+  if(!img.complete||!img.naturalWidth) return;
   const iw=img.naturalWidth, ih=img.naturalHeight;
-  function qp(u,v){
-    const su=imgFlip?1-u:u;
-    const t={x:pts[0].x+(pts[1].x-pts[0].x)*su,y:pts[0].y+(pts[1].y-pts[0].y)*su};
-    const b={x:pts[3].x+(pts[2].x-pts[3].x)*su,y:pts[3].y+(pts[2].y-pts[3].y)*su};
-    return{x:t.x+(b.x-t.x)*v,y:t.y+(b.y-t.y)*v};
+
+  function quad(u,v){
+    // bilinear interpolation of 4 corners
+    const fl=imgFlip;
+    const pu=fl?1-u:u;
+    const t={x:cors[0].x+(cors[1].x-cors[0].x)*pu, y:cors[0].y+(cors[1].y-cors[0].y)*pu};
+    const b={x:cors[3].x+(cors[2].x-cors[3].x)*pu, y:cors[3].y+(cors[2].y-cors[3].y)*pu};
+    return{x:t.x+(b.x-t.x)*v, y:t.y+(b.y-t.y)*v};
   }
+
   for(let i=0;i<MESH;i++){
     for(let j=0;j<MESH;j++){
-      const u0=i/MESH,u1=(i+1)/MESH,v0=j/MESH,v1=(j+1)/MESH;
-      const p00=qp(u0,v0),p10=qp(u1,v0),p11=qp(u1,v1),p01=qp(u0,v1);
-      const s00={x:u0*iw,y:v0*ih},s10={x:u1*iw,y:v0*ih};
-      const s11={x:u1*iw,y:v1*ih},s01={x:u0*iw,y:v1*ih};
-      triMap(s00,s10,s11,p00,p10,p11);
-      triMap(s00,s11,s01,p00,p11,p01);
+      const u0=i/MESH, u1=(i+1)/MESH;
+      const v0=j/MESH, v1=(j+1)/MESH;
+      const p00=quad(u0,v0), p10=quad(u1,v0);
+      const p11=quad(u1,v1), p01=quad(u0,v1);
+      // src texels (always non-flipped, flip handled by quad())
+      const s00={x:u0*iw,y:v0*ih}, s10={x:u1*iw,y:v0*ih};
+      const s11={x:u1*iw,y:v1*ih}, s01={x:u0*iw,y:v1*ih};
+      triDraw(s00,s10,s11, p00,p10,p11);
+      triDraw(s00,s11,s01, p00,p11,p01);
     }
   }
 }
 
-function triMap(s0,s1,s2,d0,d1,d2){
+function triDraw(s0,s1,s2, d0,d1,d2){
   const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y);
-  if(Math.abs(det)<0.5)return;
-  ctx.save();
-  ctx.beginPath();ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);
-  ctx.closePath();ctx.clip();
+  if(Math.abs(det)<0.4) return;
   const id=1/det;
   const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))*id;
   const b=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))*id;
@@ -367,223 +448,221 @@ function triMap(s0,s1,s2,d0,d1,d2){
   const d=((d1.y-d0.y)*(s2.y-s0.y)-(d2.y-d0.y)*(s1.y-s0.y))*id;
   const e=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))*id;
   const f=d0.y-d*s0.x-e*s0.y;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);
+  ctx.closePath();ctx.clip();
   ctx.transform(a,d,b,e,c,f);
-  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=18;ctx.shadowOffsetX=5;ctx.shadowOffsetY=7;
+  ctx.shadowColor='rgba(0,0,0,.5)';
+  ctx.shadowBlur=20;ctx.shadowOffsetX=6;ctx.shadowOffsetY=8;
   ctx.drawImage(img,0,0);
   ctx.restore();
 }
 
-/* ══════════════════════════════════
-   DRAW OUTLINE + XYZ AXES
-══════════════════════════════════ */
-function drawOverlay(pts,isLocked){
-  // Outline
+/* ─────────────────────────────────────────────
+   OVERLAY: outline + XYZ axes + corner handles
+───────────────────────────────────────────── */
+function drawOverlay(cors, isLocked){
+  // Quad outline
   ctx.save();
-  ctx.strokeStyle=isLocked?'rgba(80,255,160,.55)':'rgba(180,140,255,.65)';
-  ctx.lineWidth=2;ctx.setLineDash(isLocked?[6,4]:[4,3]);
+  ctx.strokeStyle=isLocked?'rgba(60,240,140,.5)':'rgba(180,140,255,.6)';
+  ctx.lineWidth=isLocked?1.5:2;
+  ctx.setLineDash(isLocked?[5,5]:[]);
   ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  [1,2,3,0].forEach(i=>ctx.lineTo(pts[i].x,pts[i].y));
-  ctx.stroke();ctx.restore();
+  ctx.moveTo(cors[0].x,cors[0].y);
+  cors.slice(1).forEach(c=>ctx.lineTo(c.x,c.y));
+  ctx.closePath();ctx.stroke();
+  ctx.restore();
 
-  // Axes from center
-  const cx=(pts[0].x+pts[1].x+pts[2].x+pts[3].x)/4;
-  const cy=(pts[0].y+pts[1].y+pts[2].y+pts[3].y)/4;
-  const xd={(pts[1].x-pts[0].x+pts[2].x-pts[3].x)/2:(pts[1].y-pts[0].y+pts[2].y-pts[3].y)/2};
-  // rebuild properly
-  const xvx=(pts[1].x-pts[0].x+pts[2].x-pts[3].x)/2;
-  const xvy=(pts[1].y-pts[0].y+pts[2].y-pts[3].y)/2;
-  const yvx=(pts[3].x-pts[0].x+pts[2].x-pts[1].x)/2;
-  const yvy=(pts[3].y-pts[0].y+pts[2].y-pts[1].y)/2;
+  // XYZ axes from center
+  const cx=(cors[0].x+cors[1].x+cors[2].x+cors[3].x)/4;
+  const cy=(cors[0].y+cors[1].y+cors[2].y+cors[3].y)/4;
+  const xvx=(cors[1].x-cors[0].x+cors[2].x-cors[3].x)/2;
+  const xvy=(cors[1].y-cors[0].y+cors[2].y-cors[3].y)/2;
+  const yvx=(cors[3].x-cors[0].x+cors[2].x-cors[1].x)/2;
+  const yvy=(cors[3].y-cors[0].y+cors[2].y-cors[1].y)/2;
   const xl=Math.hypot(xvx,xvy)||1, yl=Math.hypot(yvx,yvy)||1;
-  const S=44;
-  arrow(cx,cy, xvx/xl*S,xvy/xl*S, '#ff5555','X');
-  arrow(cx,cy, yvx/yl*S,yvy/yl*S, '#55ff88','Y');
-  // Z = approx inward
-  arrow(cx,cy, -(xvx/xl+yvx/yl)*S*0.5, -(xvy/xl+yvy/yl)*S*0.5, '#5599ff','Z');
+  const S=46;
+  drawArrow(cx,cy,xvx/xl*S,xvy/xl*S,'#ff4444','X');
+  drawArrow(cx,cy,yvx/yl*S,yvy/yl*S,'#44ff88','Y');
+  drawArrow(cx,cy,-(xvx/xl+yvx/yl)*S*0.5,-(xvy/xl+yvy/yl)*S*0.5,'#4499ff','Z');
+
+  // Corner handles (only in edit mode)
+  if(!isLocked){
+    cors.forEach((c,i)=>{
+      // Outer ring (touch area indicator)
+      ctx.beginPath(); ctx.arc(c.x,c.y,26,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,.38)'; ctx.fill();
+
+      // Colored filled circle
+      ctx.beginPath(); ctx.arc(c.x,c.y,16,0,Math.PI*2);
+      ctx.fillStyle=COLORS[i];
+      ctx.shadowColor=COLORS[i]; ctx.shadowBlur=16;
+      ctx.fill(); ctx.shadowBlur=0;
+
+      // White ring
+      ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=2.5; ctx.stroke();
+
+      // Label
+      ctx.fillStyle='#fff'; ctx.font='bold 9px monospace';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(LABELS[i],c.x,c.y);
+    });
+  }
 }
 
-function arrow(ox,oy,dx,dy,col,lbl){
-  const len=Math.hypot(dx,dy); if(len<3)return;
+function drawArrow(ox,oy,dx,dy,col,lbl){
+  const len=Math.hypot(dx,dy); if(len<4)return;
   const ang=Math.atan2(dy,dx);
   ctx.save();
-  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2.5;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox+dx,oy+dy);ctx.stroke();
-  const al=10,aw=0.42;
+  ctx.strokeStyle=col; ctx.fillStyle=col;
+  ctx.lineWidth=2.5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+dx,oy+dy); ctx.stroke();
+  const al=11,aw=0.44;
   ctx.beginPath();
   ctx.moveTo(ox+dx,oy+dy);
   ctx.lineTo(ox+dx-al*Math.cos(ang-aw),oy+dy-al*Math.sin(ang-aw));
   ctx.lineTo(ox+dx-al*Math.cos(ang+aw),oy+dy-al*Math.sin(ang+aw));
-  ctx.closePath();ctx.fill();
-  const lx=ox+dx+14*Math.cos(ang),ly=oy+dy+14*Math.sin(ang);
-  ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(lx-8,ly-8,16,16);
-  ctx.fillStyle=col;ctx.fillText(lbl,lx,ly);
+  ctx.closePath(); ctx.fill();
+  const lx=ox+dx+15*Math.cos(ang), ly=oy+dy+15*Math.sin(ang);
+  ctx.font='bold 13px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(lx-8,ly-8,16,16);
+  ctx.fillStyle=col; ctx.fillText(lbl,lx,ly);
   ctx.restore();
 }
 
-/* ══════════════════════════════════
-   LOCK / UNLOCK
-══════════════════════════════════ */
-function toggleLock(){locked?unlock():lock()}
-
-function lock(){
-  locked=true;
-  // Capture current values
-  lPX=PX;lPY=PY;lPZ=PZ;lRX=RX;lRY=RY;lRZ=RZ;lSZ=SZ;
-  // Capture gyro delta reference
-  lOA=oA;lOB=oB;lOG=oG;
-  setUI('locked');
-}
-
-function unlock(){
-  locked=null;
-  setUI('edit');
-}
-
-function setUI(mode){
-  const b=document.getElementById('badge');
-  const lb=document.getElementById('lockBtn');
-  if(mode==='edit'){
-    b.textContent='✏️ Mode Edit';b.className='edit';
-    lb.textContent='📌 Kunci';lb.className='edit';
-  } else {
-    b.textContent='🔒 3D Tracking Aktif';b.className='locked';
-    lb.textContent='🔓 Edit';lb.className='locked';
-  }
-}
-
-/* ══════════════════════════════════
-   MAIN LOOP
-══════════════════════════════════ */
+/* ─────────────────────────────────────────────
+   MAIN RENDER LOOP
+───────────────────────────────────────────── */
 function loop(){
   ctx.clearRect(0,0,W,H);
 
-  let DR, px,py,pz,rx,ry,rz,sz;
-
+  let cors;
   if(locked){
-    // In locked mode: current gyro gives fresh DR
-    // But the object position was defined relative to gyro at lock time
-    // We store a "delta" rotation: from lock-time gyro to current gyro
-    // and apply it to the locked world position
-    DR=devR(oA,oB,oG);
-
-    // Compute object position in world space at lock time
-    const lockDR=devR(lOA,lOB,lOG);
-    // Object in camera-frame at lock:
-    const op=[lPX*0.01,-lPY*0.01,-lPZ*0.01];
-    // World position = lockDR * op
-    const worldPt=mv(lockDR,op);
-
-    // Now project that world point through current DR to camera frame
-    const curRt=mt(DR);
-    const camPt=mv(curRt,worldPt);
-    // Convert back to our position params for buildQuad
-    // buildQuad takes px,py,pz in slider units → op=[px*0.01,-py*0.01,-pz*0.01]
-    // So we need op = camPt, then px=camPt[0]*100, py=-camPt[1]*100, pz=-camPt[2]*100
-    px=camPt[0]*100; py=-camPt[1]*100; pz=-camPt[2]*100;
-
-    // Rotation: we need to also rotate the object orientation by the delta
-    // lockDR rotates from cam→world at lock; curRt rotates world→current cam
-    // Combined: curRt * lockDR = delta rotation matrix
-    const deltaR=mm(curRt,lockDR);
-    // Combine delta with locked object rotation
-    const objOM=mm(mm(makeRz(lRZ),makeRy(lRY)),makeRx(lRX));
-    const finalOM=mm(deltaR,objOM);
-    // Extract euler-ish but we'll just use finalOM directly in a custom drawWarp
-    rx=lRX;ry=lRY;rz=lRZ;sz=lSZ;
-
-    // Build quad using finalOM instead of euler
-    const pts=buildQuadFromOM(finalOM,camPt,sz);
-    if(pts){
-      drawWarp(pts);
-      drawOverlay(pts,true);
-    } else {
-      behindMsg();
+    const proj=locked.map(wd=>world2px(wd));
+    if(proj.some(p=>p===null)){
+      drawBehindMsg(); animId=requestAnimationFrame(loop); return;
     }
+    cors=proj;
   } else {
-    DR=devR(oA,oB,oG);
-    px=PX;py=PY;pz=PZ;rx=RX;ry=RY;rz=RZ;sz=SZ;
-    const pts=buildQuad(DR,px,py,pz,rx,ry,rz,sz);
-    if(pts){drawWarp(pts);drawOverlay(pts,false);}
-    else behindMsg();
+    cors=corners;
   }
 
+  drawWarped(cors);
+  drawOverlay(cors,!!locked);
   animId=requestAnimationFrame(loop);
 }
 
-// Build quad from already-computed object rotation matrix + camera-frame position
-function buildQuadFromOM(OM,camPt,sz){
-  const h=sz*0.005;
-  const lc=[[-h,-h,0],[h,-h,0],[h,h,0],[-h,h,0]];
-  const identity=[1,0,0,0,1,0,0,0,1];
-  const fakeD=identity; // already in camera frame, pass through
-  const pts=[];
-  for(const c of lc){
-    const rc=mv(OM,c);
-    const wp=[rc[0]+camPt[0],rc[1]+camPt[1],rc[2]+camPt[2]];
-    const sp=w2s(wp[0],wp[1],wp[2],fakeD);
-    if(!sp)return null;
-    pts.push(sp);
-  }
-  return pts;
-}
-
-function behindMsg(){
+function drawBehindMsg(){
   ctx.save();
-  ctx.fillStyle='rgba(255,200,60,.85)';
-  ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('↩ Foto di belakang — geser slider Z atau putar HP',W/2,H*0.5);
+  ctx.fillStyle='rgba(255,200,80,.9)';
+  ctx.font='bold 13px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('↩ Foto di belakang kamu — putar HP',W/2,H/2);
   ctx.restore();
 }
 
-/* ══════════════════════════════════
-   BUTTONS
-══════════════════════════════════ */
-function resetAll(){
-  unlock();imgFlip=false;alphaOff=null;
-  PX=0;PY=0;PZ=80;RX=0;RY=0;RZ=0;SZ=120;
-  setSlider('px',0);setSlider('py',0);setSlider('pz',80);
-  setSlider('rrx',0);setSlider('rry',0);setSlider('rrz',0);
-  setSlider('sz',120);
-  onSlider();
-}
-function doFlip(){imgFlip=!imgFlip}
-async function saveSnap(){
-  const sc=document.createElement('canvas');sc.width=W;sc.height=H;
-  const sx=sc.getContext('2d');
-  sx.drawImage(document.getElementById('vid'),0,0,W,H);
-  sx.drawImage(canvas,0,0);
-  const a=document.createElement('a');a.download='ar-wall-3d.jpg';
-  a.href=sc.toDataURL('image/jpeg',.93);a.click();
+/* ─────────────────────────────────────────────
+   POINTER INPUT  (unified touch + mouse)
+   Key: e.preventDefault() is called IMMEDIATELY
+   in touchstart — this blocks all long-press popups
+───────────────────────────────────────────── */
+function getEventPos(e){
+  // Returns {x,y} from touch or mouse event
+  const src=e.touches?e.touches[0]:e;
+  return{x:src.clientX, y:src.clientY};
 }
 
-/* ══════════════════════════════════
-   GYRO
-══════════════════════════════════ */
+function nearestCorner(x,y){
+  let best=-1, bd=9999;
+  corners.forEach((c,i)=>{
+    const d=Math.hypot(x-c.x,y-c.y);
+    if(d<bd){bd=d;best=i}
+  });
+  return bd<HIT_R*2 ? best : -1;
+}
+
+function onPointerDown(e){
+  // ← CRITICAL: prevent context menu / long-press popup immediately
+  e.preventDefault();
+  e.stopPropagation();
+  if(locked) return;
+  const p=getEventPos(e);
+  const idx=nearestCorner(p.x,p.y);
+  if(idx>=0){
+    activeIdx=idx;
+  } else {
+    // drag entire image
+    activeIdx=4;
+    moveStart={x:p.x,y:p.y};
+    cornersSnap=corners.map(c=>({...c}));
+  }
+}
+
+function onPointerMove(e){
+  e.preventDefault();
+  e.stopPropagation();
+  if(locked||activeIdx===-1) return;
+  const p=getEventPos(e);
+  if(activeIdx>=0&&activeIdx<4){
+    corners[activeIdx]={x:p.x,y:p.y};
+  } else if(activeIdx===4&&moveStart){
+    const dx=p.x-moveStart.x, dy=p.y-moveStart.y;
+    corners=cornersSnap.map(c=>({x:c.x+dx,y:c.y+dy}));
+  }
+}
+
+function onPointerUp(e){
+  e.preventDefault();
+  activeIdx=-1;
+  moveStart=null;
+  cornersSnap=null;
+}
+
+// Register on canvas with {passive:false} to enable preventDefault in touchstart
+function bindCanvasEvents(){
+  // Touch
+  canvas.addEventListener('touchstart',  onPointerDown, {passive:false, capture:true});
+  canvas.addEventListener('touchmove',   onPointerMove, {passive:false, capture:true});
+  canvas.addEventListener('touchend',    onPointerUp,   {passive:false, capture:true});
+  canvas.addEventListener('touchcancel', onPointerUp,   {passive:false, capture:true});
+  // Mouse (desktop)
+  canvas.addEventListener('mousedown', onPointerDown);
+  canvas.addEventListener('mousemove', onPointerMove);
+  canvas.addEventListener('mouseup',   onPointerUp);
+  // Block context menu on canvas specifically
+  canvas.addEventListener('contextmenu', e=>{e.preventDefault();e.stopPropagation();return false;}, true);
+}
+
+/* ─────────────────────────────────────────────
+   GYROSCOPE
+───────────────────────────────────────────── */
 function onOri(e){
   if(e.beta===null)return;
   const rawA=e.alpha||0;
-  if(alphaOff===null)alphaOff=rawA;
-  oA=((rawA-alphaOff)+360)%360*Math.PI/180;
-  oB=e.beta*Math.PI/180;
-  oG=e.gamma*Math.PI/180;
+  if(alphaOff===null) alphaOff=rawA;
+  oA=((rawA-alphaOff+360)%360)*DEG;
+  oB=e.beta*DEG;
+  oG=e.gamma*DEG;
   hasOri=true;
 }
 
 function setupOri(){
-  if(typeof DeviceOrientationEvent!=='undefined'&&
+  if(typeof DeviceOrientationEvent!=='undefined' &&
      typeof DeviceOrientationEvent.requestPermission==='function'){
     document.getElementById('permOvl').style.display='flex';
   } else {
     window.addEventListener('deviceorientation',onOri,true);
+    // Desktop mouse simulation
     if(!('ontouchstart' in window)){
       hasOri=true;
-      document.addEventListener('mousemove',e=>{
-        oA=((e.clientX/W)-0.5)*1.8;
-        oB=Math.PI*0.5+((e.clientY/H)-0.5)*1.1;
+      document.addEventListener('mousemove',me=>{
+        if(activeIdx!==-1) return; // don't interfere with dragging
+        oA=((me.clientX/W)-0.5)*1.8;
+        oB=Math.PI/2+((me.clientY/H)-0.5)*1.1;
         oG=0;
       });
+      setHint('🖥️ Desktop: gerakkan mouse untuk preview 3D');
     }
   }
 }
@@ -592,64 +671,132 @@ async function reqPerm(){
   document.getElementById('permOvl').style.display='none';
   try{
     const r=await DeviceOrientationEvent.requestPermission();
-    if(r==='granted')window.addEventListener('deviceorientation',onOri,true);
+    if(r==='granted') window.addEventListener('deviceorientation',onOri,true);
+    else setHint('⚠️ Izin ditolak — 3D tracking tidak aktif');
   }catch{window.addEventListener('deviceorientation',onOri,true)}
 }
 
-/* ══════════════════════════════════
-   RESIZE / START / STOP
-══════════════════════════════════ */
-function resize(){
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
+/* ─────────────────────────────────────────────
+   UI HELPERS
+───────────────────────────────────────────── */
+function setEditMode(){
+  document.getElementById('badge').textContent='✏️ Edit — Drag 4 Sudut';
+  document.getElementById('badge').className='edit';
+  document.getElementById('lockBtn').textContent='📌 Kunci 3D';
+  document.getElementById('lockBtn').className='abtn green';
 }
 
+function setLockedMode(){
+  document.getElementById('badge').textContent='🔒 Terkunci — 3D Tracking Aktif';
+  document.getElementById('badge').className='locked';
+  document.getElementById('lockBtn').textContent='🔓 Edit Ulang';
+  document.getElementById('lockBtn').className='abtn blue';
+}
+
+function setHint(msg){
+  const el=document.getElementById('hint');
+  el.textContent=msg;
+  el.style.opacity=msg?'1':'0';
+}
+
+function doFlip(){
+  imgFlip=!imgFlip;
+}
+
+async function saveSnap(){
+  const sc=document.createElement('canvas');
+  sc.width=W; sc.height=H;
+  const sx=sc.getContext('2d');
+  sx.drawImage(document.getElementById('vid'),0,0,W,H);
+  sx.drawImage(canvas,0,0);
+  const a=document.createElement('a');
+  a.download='ar-wall-3d.jpg';
+  a.href=sc.toDataURL('image/jpeg',.93);
+  a.click();
+}
+
+/* ─────────────────────────────────────────────
+   FILE PICK
+───────────────────────────────────────────── */
+function onFile(e){
+  const f=e.target.files[0]; if(!f)return;
+  const url=URL.createObjectURL(f);
+  img.src=url;
+  const pv=document.getElementById('prevImg');
+  pv.src=url; pv.style.display='block';
+  document.getElementById('ph').style.display='none';
+}
+
+/* ─────────────────────────────────────────────
+   START / STOP
+───────────────────────────────────────────── */
 async function startAR(){
-  if(!img.src||img.src===window.location.href)img.src=buildDefaultImg();
+  if(!img.src||img.src===location.href) img.src=buildDefaultImg();
+
   try{
     camStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
-  }catch(e){alert('Kamera gagal:\n'+e.message);return}
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+      audio:false
+    });
+  }catch(err){
+    alert('Kamera gagal diakses:\n'+err.message); return;
+  }
+
   const vid=document.getElementById('vid');
-  vid.srcObject=camStream;await vid.play();
+  vid.srcObject=camStream;
+  await vid.play();
+
   document.getElementById('splash').style.display='none';
   document.getElementById('ar').style.display='block';
-  canvas=document.getElementById('cv');ctx=canvas.getContext('2d');
-  resize();
+
+  canvas=document.getElementById('cv');
+  ctx=canvas.getContext('2d');
+
+  W=canvas.width =window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  initCorners(true);
+  bindCanvasEvents();
+  setEditMode();
+  setHint('Drag sudut berwarna · Drag tengah untuk geser semua');
+
   window.addEventListener('resize',resize);
-  screen.orientation&&screen.orientation.addEventListener('change',()=>setTimeout(resize,300));
-  onSlider();setupOri();
+  if(screen.orientation) screen.orientation.addEventListener('change',()=>setTimeout(resize,300));
+
+  setupOri();
   animId=requestAnimationFrame(loop);
 }
 
 function stopAR(){
-  cancelAnimationFrame(animId);animId=null;
-  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  cancelAnimationFrame(animId); animId=null;
+  if(camStream){camStream.getTracks().forEach(t=>t.stop()); camStream=null;}
   window.removeEventListener('deviceorientation',onOri,true);
   window.removeEventListener('resize',resize);
   document.getElementById('ar').style.display='none';
   document.getElementById('splash').style.display='flex';
-  locked=null;hasOri=false;alphaOff=null;imgFlip=false;
-  setUI('edit');
+  locked=null; hasOri=false; alphaOff=null; imgFlip=false;
+  activeIdx=-1; moveStart=null; cornersSnap=null;
+  setHint('Drag sudut berwarna · Drag tengah untuk geser semua');
 }
 
-/* ══════════════════════════════════
-   DEFAULT IMAGE
-══════════════════════════════════ */
+/* ─────────────────────────────────────────────
+   DEFAULT IMAGE (square gradient)
+───────────────────────────────────────────── */
 function buildDefaultImg(){
-  const c=document.createElement('canvas');c.width=600;c.height=600;
+  const c=document.createElement('canvas'); c.width=c.height=600;
   const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,600,600);
-  g.addColorStop(0,'#2211bb');g.addColorStop(.5,'#9922dd');g.addColorStop(1,'#ff4422');
-  x.fillStyle=g;x.fillRect(0,0,600,600);
-  x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=1;
-  for(let i=0;i<600;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,600);x.stroke();
-    x.beginPath();x.moveTo(0,i);x.lineTo(600,i);x.stroke()}
-  x.strokeStyle='rgba(255,255,255,.3)';x.lineWidth=5;x.strokeRect(15,15,570,570);
-  x.fillStyle='rgba(255,255,255,.88)';x.font='bold 60px Arial';x.textAlign='center';
-  x.fillText('AR IMAGE',300,275);
-  x.font='20px Arial';x.fillStyle='rgba(255,255,255,.5)';
-  x.fillText('Pilih foto dari splash',300,335);
+  g.addColorStop(0,'#2211cc'); g.addColorStop(.5,'#aa22dd'); g.addColorStop(1,'#ff5522');
+  x.fillStyle=g; x.fillRect(0,0,600,600);
+  x.strokeStyle='rgba(255,255,255,.08)'; x.lineWidth=1;
+  for(let i=0;i<600;i+=40){
+    x.beginPath();x.moveTo(i,0);x.lineTo(i,600);x.stroke();
+    x.beginPath();x.moveTo(0,i);x.lineTo(600,i);x.stroke();
+  }
+  x.strokeStyle='rgba(255,255,255,.3)'; x.lineWidth=6; x.strokeRect(18,18,564,564);
+  x.fillStyle='rgba(255,255,255,.9)'; x.font='bold 68px Arial'; x.textAlign='center';
+  x.fillText('AR IMAGE',300,280);
+  x.font='22px Arial'; x.fillStyle='rgba(255,255,255,.5)';
+  x.fillText('Pilih foto dari splash',300,350);
   return c.toDataURL();
 }
 </script>
